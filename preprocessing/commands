@@ -1,0 +1,5 @@
+python extract.py -xyz "xyz_directory" -sdf "sdf_directory" -sd "save_directory" -s "start" -e "end" -i "interval"
+python configure.py -dd "data_directory" -n "num_core" -s "file_size"
+python resave.py -dd "data_directory"
+python xtb_sbatch.py -dd "data_directory" -gn "geometry_name" -s "start" -e "end" -wd "working_directory" -cn "calculator_name"
+python xtb_filter.py -dd "data_directory" -gn "geometry_name" -cn "calculator_name"

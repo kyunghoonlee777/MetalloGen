@@ -281,7 +281,7 @@ class MetalComplex:
             distance += 1
         return neighbor_list
     
-def get_om_from_modified_smiles(smiles, charge=None, multiplicity=None):
+def get_om_from_modified_smiles(smiles):
     from rdkit import Chem
     import ligand
     

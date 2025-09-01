@@ -180,12 +180,10 @@ class TMCOptimizer:
             atom_indices = atom_indices_for_each_ligand[i]        
             binding_infos = ligand.binding_infos # [[indices, geometric_idx]]
 
-            #print('Ligand :', Chem.MolToSmiles(rd_mol), binding_infos)        
             tmp_indices = []
             for j in range(len(atom_indices)):
                 tmp_positions.append(final_positions[atom_indices[j]])
                 ligand_to_metal[len(tmp_positions)-1] = atom_indices[j]
-                #tmp_indices.append(cnt + j)
                 tmp_indices.append(cnt + j + 1) # Because metal goes to index 0
             ligand_atom_indices.append(tmp_indices)
             ligand_adj_matrices.append(valid_ace_mol.get_adj_matrix())
@@ -209,10 +207,8 @@ class TMCOptimizer:
                 scanning_indices += binding_groups
             ligand_binding_group_infos[tuple(total_binding_groups)] = list(range(cnt, cnt+len(atom_indices)))
             cnt += len(atom_indices)
-            #ligand_binding_group_infos[tuple(total_binding_groups)] = atom_indices
 
         # Construct original_ligand_adj_matrix ...
-        #print (cnt, ligand_atom_indices)
         original_ligand_adj_matrix = np.zeros((cnt+1,cnt+1)) 
         for k, atom_indices in enumerate(ligand_atom_indices):
             reduce_function = np.ix_(atom_indices, atom_indices)
@@ -226,12 +222,8 @@ class TMCOptimizer:
 
         Chem.SanitizeMol(combined_rd_mol)    
         AllChem.EmbedMolecule(combined_rd_mol, useRandomCoords = True, maxAttempts = 100, useBasicKnowledge = False, ignoreSmoothingFailures = True) 
-        #print("CHECK POINT 1")
-        #print(Chem.MolToSmiles(combined_rd_mol))
-        #exit()
-
+        
         # Make force fields ...
-
         tmp_positions = np.array(tmp_positions)
         mmff = None
         uff = None
@@ -258,13 +250,9 @@ class TMCOptimizer:
         sorted_ligand_binding_groups_list = sorted(ligand_binding_group_infos, key=lambda x:len(ligand_binding_group_infos[x]))
 
         final_success = True
-
-        #print (target_values, scale)
-        #print (sorted_ligand_binding_groups_list)
          
         # Scan by each ligand ...
         for ligand_idx,ligand_binding_groups in enumerate(sorted_ligand_binding_groups_list):
-            #print ('Scanning ',ligand_binding_groups)
             for k in range(100):
                 # Also, get old adj matrix ...
                 old_positions = np.copy(tmp_positions)
@@ -279,10 +267,8 @@ class TMCOptimizer:
 
                 # Translation ...
                 abs_delta = 0
-                #print (f'{k+1}th scan')
                 current_binding_indices = []
                 for binding_groups in list(ligand_binding_groups):
-                    #print (binding_groups)
                     binding_vectors = []
                     for idx in binding_groups:
                         binding_vectors.append(tmp_positions[idx].tolist())
@@ -300,7 +286,6 @@ class TMCOptimizer:
                         delta_d = -step_size
                     if abs_delta < abs(delta_d):
                         abs_delta = delta_d
-                    #print ('dddddddd',delta_d, d) 
                     for idx in binding_groups:
                         tmp_positions[idx] -= delta_d * v/d
 
@@ -313,11 +298,6 @@ class TMCOptimizer:
                     for i, position in enumerate(tmp_positions):
                         x, y, z = position
                         conformer.SetAtomPosition(i, Point3D(x,y,z))    
-             
-                    #ff = AllChem.MMFFGetMoleculeForceField(combined_rd_mol, AllChem.MMFFGetMoleculeProperties(combined_rd_mol))
-                    #ff = OPLSGetMoleculeForceField(combined_rd_mol)
-                    #ff = AllChem.UFFGetMoleculeForceField(combined_rd_mol)
-                     
 
                     # Set force fields ... 
                     mmff = AllChem.MMFFGetMoleculeForceField(combined_rd_mol, AllChem.MMFFGetMoleculeProperties(combined_rd_mol))
@@ -415,7 +395,6 @@ class TMCOptimizer:
                                     break
 
                         if adj_change:
-                            #print(formed_bonds, removed_bonds)
                             print('[FF Scan] Adjacent matrix has changed ... Restoring to the original positions !')
                             print_rd_geometry(combined_rd_mol,tmp_positions)
                             tmp_positions = old_positions
@@ -427,7 +406,6 @@ class TMCOptimizer:
                             
                         else:
                             ff_success = True
-                            #print_rd_geometry(combined_rd_mol,tmp_positions)
                             break
 
                 else:
@@ -437,27 +415,21 @@ class TMCOptimizer:
                 if not ff_success:
                     final_success = False
                     break
-
-        #print_rd_geometry(combined_rd_mol,tmp_positions)
-
+                
         # check move_dict to determine the success of FF clean 
         # Less than int(success_criteria/step_size)+1 should be left for successful clean ...
-        #check_list = [num_scan - moved_dict[ligand_binding_groups] < int(self.success_criteria/step_size) + 1 for ligand_binding_groups in moved_dict]
 
-        #print (moved_dict, num_scan)
         # If fine, update final positions
         for i in ligand_to_metal:
             x,y,z = tmp_positions[i]
             final_positions[ligand_to_metal[i]] = [x,y,z]
         # Update ligand ...
         metal_complex.set_position(final_positions)
-        #print ('moved', moved_dict,num_scan)
         return final_success
 
 
 
     def qc_clean(self,metal_complex,scale = 1.0):
-        #ML_dist_dict = self.ML_dist_dict
         ligands = metal_complex.ligands
         atom_indices_for_each_ligand = metal_complex.get_atom_indices_for_each_ligand()
         center_atom = metal_complex.center_atom
@@ -529,11 +501,6 @@ class TMCOptimizer:
         fixing_atoms = list(set(fixing_atoms))
         fixing_atoms = [[i] for i in fixing_atoms]
 
-        #print (tmp_molecule.get_chg(), tmp_molecule.get_multiplicity())
-
-        #print ('QC scan starting geometry ...')
-        #tmp_molecule.print_coordinate_list()
-
         # Start scan ...
         try:
             energy_list = [calculator.get_energy(tmp_molecule)]
@@ -545,7 +512,6 @@ class TMCOptimizer:
         original_ligand_adj_matrix = np.copy(metal_complex.get_adj_matrix())
         original_ligand_adj_matrix[metal_index,:] = 0
         original_ligand_adj_matrix[:,metal_index] = 0
-
 
         for i in range(num_scan):
 
@@ -565,25 +531,12 @@ class TMCOptimizer:
                     tmp_positions[j] -= v * delta_d/num_scan
             process.locate_molecule(tmp_molecule,tmp_positions)
 
-            '''
-            if i == 0:
-                initial_hessian = 'calcfc'
-                chk_file = None
-            else:
-                initial_hessian = 'readfc'
-                chk_file = self.chk_file
-            '''
-
             calculator.relax_geometry(tmp_molecule,fixing_atoms,num_relaxation=num_relaxation,file_name=f'qc_relax_{i+1}',maximal_displacement=maximal_displacement)
             energy = tmp_molecule.energy
 
             if energy is None:
                 print("Calculation was not successful ...")
                 return False
-            #if energy > energy_list[-1]: # If unstabilized ...
-            #    process.locate_molecule(tmp_molecule,prev_positions) # Restore to old positions ...
-            #    tmp_molecule.energy = energy_list[-1]
-            #    break
             new_positions = tmp_molecule.get_coordinate_list()
             
             # Check the validity of the geometry
@@ -592,9 +545,6 @@ class TMCOptimizer:
             ratio_matrix = distance_matrix/R
             min_ratio = np.min(ratio_matrix)
             m = len(ratio_matrix)
-            #for i in range(m):
-            #    for j in range(m):
-            #        print (i, j, ratio_matrix[i][j], distance_matrix[i][j])
 
             # Check collapse between atoms ...
             if min_ratio < ratio_criteria or not np.all(distance_matrix) > atom_d_criteria: 
@@ -603,20 +553,6 @@ class TMCOptimizer:
                 process.locate_molecule(tmp_molecule,prev_positions)
                 tmp_molecule.energy = energy_list[-1]
                 break
-
-            # Omitted since we believe the van der Waals force considered by quantum chemical calculations ...
-            '''
-            # Check the ratio between metal and the binding indices ... 
-
-            min_ratio = np.min(ratio_matrix[metal_index,fixing_atoms])
-            total_min_ratio = np.min(ratio_matrix[metal_index])
-            if min_ratio < self.bond_criteria and min_ratio > total_min_ratio + 0.1:
-                print ('[QC scan] Other atoms are likely to bind to the metal ... Using the previous positions !')
-                tmp_molecule.print_coordinate_list()
-                process.locate_molecule(tmp_molecule,prev_positions)
-                tmp_molecule.energy = energy_list[-1]
-                break
-            '''
 
             # Check the distance between ligands ...
             ligand_adj_matrix = np.where(ratio_matrix < bond_criteria - 0.15, 1, 0)

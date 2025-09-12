@@ -24,6 +24,7 @@ setuptools.setup(
         "numpy",
         "scipy",
         "cclib",
+        "rdkit",
     ],
     entry_points={
         "console_scripts": [

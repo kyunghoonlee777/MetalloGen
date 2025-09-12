@@ -1,8 +1,9 @@
-import process
 import numpy as np
 from scipy.spatial.transform import Rotation as R
 from itertools import permutations
-import globalvars as gv
+
+from MetalloGen import process
+from MetalloGen import globalvars as gv
 
 def get_binding_sites(adj_matrix, metal_index):
     adj_matrix = np.array(adj_matrix)

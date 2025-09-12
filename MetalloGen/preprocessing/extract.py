@@ -1,7 +1,7 @@
-from MetalloGen import chem, process
-
 import numpy as np
 import pickle
+
+from MetalloGen import chem, process
 
 def is_organometallic(molecule,metal_z_list):
     for atom in molecule.atom_list:
@@ -9,7 +9,6 @@ def is_organometallic(molecule,metal_z_list):
         if atomic_number in metal_z_list:
             return True
     return False
-
 
 def extract_organometallics(intermediate,metal_z_list):
     molecule_list = intermediate.get_molecule_list()
@@ -49,8 +48,6 @@ def get_adj_from_sdf(intermediate,sdf_directory):
                 adj_matrix[j][i] = 1
 
     return adj_matrix, chg_info
-
-
 
 def main(args):
     import os
@@ -127,8 +124,6 @@ def main(args):
                 pickle.dump(om_info_list,f)
             om_info_list = []
             file_start = file_end
-
-
 
 if __name__ == "__main__":
     import argparse

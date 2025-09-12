@@ -1,6 +1,6 @@
-import chem
-
 import sys
+
+from MetalloGen import chem
 
 molecule = chem.Intermediate(sys.argv[1])
 chg = molecule.get_chg()

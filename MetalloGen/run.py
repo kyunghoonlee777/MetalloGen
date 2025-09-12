@@ -3,19 +3,18 @@ This is the main file for the MetalloGen package
 MetalloGen is a package that generate 3D structures of organometallic complexes
 """
 
-import globalvars as gv
-import om, embed, clean_geometry
-
-from Calculator import orca, gaussian
-
+import time
 import os
-import cclib
+import argparse
+import pickle
+
 import numpy as np
 from scipy.spatial.distance import cdist
 
-import time
-import pickle
+from MetalloGen import globalvars as gv
+from MetalloGen import om, embed, clean_geometry
 
+from MetalloGen.Calculator import orca, gaussian
 
 class TMCGenerator:
 
@@ -26,7 +25,6 @@ class TMCGenerator:
         self.corrector = 0.2
         self.align = align
         self.always_qc = always_qc
-        
 
     def sample_conformer(self,metal_complex,return_time = False):
         options = [0, 1]
@@ -108,7 +106,19 @@ class TMCGenerator:
             return ace_mols
 
 # Main function to run the experiment for generating 3D structure of CSD structures
-def main(args=None):
+def main():
+    np.set_printoptions(threshold=1000)
+
+    parser = argparse.ArgumentParser(
+        description="Generate 3D structure of organometallic complex"
+    )
+    parser.add_argument("--smiles", "-s", type=str, help="Input MSMILES string")
+    parser.add_argument("--working_directory", "-wd", type=str, help="Scratch directory for running quantum chemical calculation", default=None)
+    parser.add_argument("--save_directory", "-sd", type=str, help="Directory to save the results", default=None)
+    parser.add_argument("--final_relax", "-r", type=int, help="Whether to perform final relaxation after generation", default=1)
+
+    args = parser.parse_args()
+
     working_directory = args.working_directory
     save_directory = args.save_directory
     smiles = args.smiles
@@ -234,18 +244,5 @@ def main(args=None):
         print ("Success: False")
         
     
-
 if __name__ == "__main__":
-    
-    import argparse
-
-    np.set_printoptions(threshold=1000)
-
-    parser = argparse.ArgumentParser(description="Generate 3D structure of organometallic complex")
-    parser.add_argument("--smiles", "-s" , type=str, help="Input MSMILES string")
-    parser.add_argument("--working_directory", "-wd", type=str, help="Scratch directory for running quantum chemical calculation", default=None)
-    parser.add_argument("--save_directory", "-sd", type=str, help="Directory to save the results", default=None)
-    parser.add_argument("--final_relax", "-r", type=int, help="Whether to perform final relaxation after generation", default=1)
-  
-    args = parser.parse_args()
-    main(args)
+    main()

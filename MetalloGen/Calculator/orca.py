@@ -12,9 +12,8 @@ import distutils.spawn
 import numpy as np
 
 ### ace-reaction libraries ###
-import chem
-import process
-from Calculator import xtb_to_orca
+from MetalloGen import chem, process
+from MetalloGen.Calculator import xtb_to_orca
 
 
 '''

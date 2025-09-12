@@ -1,10 +1,8 @@
 import os
 import numpy as np
 
-
-import chem
-
-from utils import frag
+from MetalloGen import chem
+from MetalloGen.utils import frag
 
 visit=[] 
 visited_V=[]

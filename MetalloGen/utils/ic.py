@@ -1,9 +1,9 @@
-import chem
-import process
 from rdkit import Chem
 
 import numpy as np
 import itertools
+
+from MetalloGen import chem, process
 
 def arccos(x):
     return np.arccos(x)

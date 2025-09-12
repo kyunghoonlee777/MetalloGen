@@ -1,18 +1,14 @@
+import sys
+import os
+
 import numpy as np
 import itertools
 import string
 import pickle
 
-import geometries as geom
-import sys
-import os
-
-
-import chem
-from utils import am
+from MetalloGen.utils import am
 
 def main(args):
-    
     data_directory = args.data_directory
     om_save_directory = os.path.join(data_directory,'om/')
     if not os.path.exists(om_save_directory):

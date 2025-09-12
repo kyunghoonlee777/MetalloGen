@@ -1,6 +1,3 @@
-from MetalloGen import chem, process
-from MetalloGen.utils import shape
-
 import numpy as np
 import pickle
 
@@ -8,6 +5,8 @@ import geometries as geom
 from scipy.spatial.transform import Rotation as R
 from itertools import permutations
 
+from MetalloGen import chem, process
+from MetalloGen.utils import shape
 
 def get_normalized_vector(v):
     d = np.linalg.norm(v)
@@ -17,7 +16,6 @@ def get_normalized_vector(v):
     else:
         return v/d
 
-
 def get_ligand_center(molecule,ligand_site):
     site_coordinates = []
     coordinate_list = molecule.get_coordinate_list()
@@ -26,7 +24,6 @@ def get_ligand_center(molecule,ligand_site):
         site_coordinates.append(coordinate)
     site_coordinates = np.array(site_coordinates)
     return np.mean(site_coordinates,axis=0)
-
 
 def get_geometry_info(molecule, metal_index,ligand_sites):
     vectors = []
@@ -38,7 +35,6 @@ def get_geometry_info(molecule, metal_index,ligand_sites):
         vector = get_normalized_vector(vector)
         vectors.append(vector)
     return vectors
-
 
 def get_ligand_sites(molecule,metal_z_list):
     
@@ -102,7 +98,6 @@ def get_ligand_sites(molecule,metal_z_list):
         ligand_binding_infos.append(binding_info)
     return ligands,ligand_binding_infos,ligand_sites, metal_indices
 
-
 def calculate_shape_similarity(geometry_info,vector_infos_dict):
     
     rmsd_dict = dict()
@@ -118,7 +113,6 @@ def calculate_shape_similarity(geometry_info,vector_infos_dict):
         rmsd_dict[key] = rmsd
         
     return rmsd_dict
-    
 
 def process_oms(om_info_list, metal_z_list):
     '''
@@ -188,7 +182,6 @@ def process_oms(om_info_list, metal_z_list):
         
 
     return om_infos, ligand_infos
-
 
 def main(args):
     import sys
@@ -280,7 +273,6 @@ def main(args):
             sub_ligand_infos[keys[j]] = ligand_infos[keys[j]]
         with open(os.path.join(ligand_save_directory,f'ligand_info_{start}_{end}.pkl'),'wb') as f:
             pickle.dump(sub_ligand_infos,f)
-
 
 if __name__ == "__main__":
     import argparse

@@ -15,9 +15,7 @@ import distutils.spawn
 import cclib
 
 ### ace-reaction libraries ###
-from acerxn import chem
-from acerxn import process
-
+from MetalloGen import chem, process
 
 class MLPotential: # Only can be combined with Gaussian! 
 

@@ -10,13 +10,11 @@ import argparse
 import numpy as np
 import distutils.spawn
 
-
 ### Module for reading gaussian files ###
 import cclib
 
 ### ace-reaction libraries ###
-import chem
-import process
+from MetalloGen import chem, process
 
 def get_coords_from_out(file_directory):
     # count number of instances of 

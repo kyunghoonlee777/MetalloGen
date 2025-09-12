@@ -15,8 +15,7 @@ import distutils.spawn
 import cclib
 
 ### ace-reaction libraries ###
-import chem
-import process
+from MetalloGen import chem, process
 
 def cclib_rot_const_fix(file_path):
     # Read the content of the file

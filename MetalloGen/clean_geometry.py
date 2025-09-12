@@ -1,19 +1,18 @@
 import numpy as np
+import pickle as pkl
+
 from rdkit import Chem
 from rdkit.Chem import AllChem
 from rdkit.Geometry import Point3D
-import pickle as pkl
 from rdkit.Chem.rdmolops import GetAdjacencyMatrix
-
-import chem, process
-from utils import ic
-
-from Calculator import orca, xtb_gaussian
-import embed
 
 from scipy.spatial.transform import Rotation as R
 from scipy.spatial.distance import cdist
 
+from MetalloGen import embed
+from MetalloGen import chem, process
+from MetalloGen.utils import ic
+from MetalloGen.Calculator import orca, xtb_gaussian
 
 def print_rd_geometry(rd_mol, positions):
     for i, rd_atom in enumerate(rd_mol.GetAtoms()):

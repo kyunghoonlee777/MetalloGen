@@ -1,10 +1,9 @@
-import embed
-import globalvars as gv
-import chem, process
-
 import numpy as np
 import copy
 
+from MetalloGen import embed
+from MetalloGen import globalvars as gv
+from MetalloGen import chem, process
 
 class Geometry:
     
@@ -16,7 +15,6 @@ class Geometry:
  
     def get_steric_number(self):
         return len(self.direction_vector)
-
 
 class MetalComplex:
 
@@ -43,7 +41,6 @@ class MetalComplex:
         self.multiplicity = multiplicity
         self.name = None
 
-
     def get_atom_indices_for_each_ligand(self):
         if len(self.atom_indices_for_each_ligand) > 0:
             return self.atom_indices_for_each_ligand
@@ -58,8 +55,7 @@ class MetalComplex:
                 n += m
             self.atom_indices_for_each_ligand = atom_indices_for_each_ligand
             return atom_indices_for_each_ligand
-
-
+            
     def get_binding_groups(self):
         ligands = self.ligands
         atom_indices_for_each_ligand = self.get_atom_indices_for_each_ligand()
@@ -79,7 +75,6 @@ class MetalComplex:
 
         return binding_groups
             
-
     def get_adj_matrix(self):
         metal_index = self.metal_index
         ligands = self.ligands
@@ -190,7 +185,6 @@ class MetalComplex:
         
         return new_complex
         
-    
     def get_stereoisomers(self):  
         geometry_type = self.geometry_type
         permutations = geometry_type.permutations
@@ -208,7 +202,6 @@ class MetalComplex:
                         ligand.binding_infos[j] = (binding_info[0], permutation[i])
                 isomers.append(isomer)
         return isomers
-            
             
     def get_embedding(self,num_conformer = 10, d_criteria = 0.5, align=True):
         #options = [0, 1, 2]
@@ -243,7 +236,6 @@ class MetalComplex:
             exit()
         return candidate_positions
 
-
     def print_coordinate_list(self):
         atom_list = self.get_atom_list()
         n = len(atom_list)
@@ -255,7 +247,6 @@ class MetalComplex:
             print_z = f"{coordinate[2]:>12.8f}"
             print(f"{element:<3} {print_x} {print_y} {print_z}")
         print()
-
 
     def get_distances_from_center(self):
         """
@@ -307,6 +298,5 @@ def get_om_from_modified_smiles(smiles):
 
     return metal_complex
             
-
 if __name__ == "__main__":
     pass

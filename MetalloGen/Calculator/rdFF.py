@@ -11,8 +11,7 @@ from rdkit.Chem.rdForceFieldHelpers import (
 import rdkit.ForceField.rdForceField as FF
 
 ### ace-reaction libraries ###
-import chem
-import process
+from MetalloGen import chem, process
 
 
 def get_rd_mol3D(ace_mol):

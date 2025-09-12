@@ -1,21 +1,18 @@
+import random
+import itertools
 import numpy as np
+
 from rdkit.Geometry import Point3D
 from rdkit import Chem
 from rdkit.Chem import AllChem
-
-import chem, process
-import globalvars as gv
-from utils import ic
+from rdkit.Chem import rdDistGeom
 
 from scipy.spatial.transform import Rotation as R
 from scipy.spatial.distance import cdist
 
-from rdkit.Chem import rdDistGeom
-
-import random
-import itertools
-
-import time
+from MetalloGen import chem, process
+from MetalloGen import globalvars as gv
+from MetalloGen.utils import ic
 
 def get_transition_metal_center(geometry_name):
     
@@ -25,7 +22,6 @@ def get_transition_metal_center(geometry_name):
         '4_square_planar': 78,
     }
     return tm_center.get(geometry_name,26)
-
 
 def get_dummy_center_for_valid(geometry_name):
     # Get the dummy center to get valid ace molecule
@@ -38,7 +34,6 @@ def get_dummy_center_for_valid(geometry_name):
     }
     steric_number = geometry_name.split('_')[0]
     return dummy_centers[steric_number] if steric_number in dummy_centers else chem.Atom('Fe')
-
 
 def get_dummy_center(geometry_name):
     # Get the dummy center to embed the molecule
@@ -122,8 +117,7 @@ def initialize_molecule_properties(metal_complex, option):
             if check_dummy_atom(binding_indices, binding_infos, option):
                 total_atom_num += 1        
                 
-    return total_atom_num, total_wo_dummy, total_chg, total_mult, total_atom_list
-    
+    return total_atom_num, total_wo_dummy, total_chg, total_mult, total_atom_list  
     
 def get_alternative_molecule(metal_complex, option):
     """
@@ -247,12 +241,10 @@ def get_alternative_molecule(metal_complex, option):
     
     return ace_mol_list, dummy_indices, metal_binding_infos
 
-# TODO: Move to utils 
 def get_repulsive_potential(coordinate_list, d_criteria=0.5, p=6):
     distance_matrix = cdist(coordinate_list, coordinate_list)
     potential_matrix = 1/(distance_matrix-d_criteria)**p
     return np.sum(potential_matrix)
-
 
 def align_double_single_ligand(metal_complex, positions, d_criteria=1.7):
     
@@ -342,7 +334,6 @@ def align_double_single_ligand(metal_complex, positions, d_criteria=1.7):
                 
     
     return positions
-
 
 def get_embedding(metal_complex, scale=1.0, option=0, align=False, use_random=True):
     

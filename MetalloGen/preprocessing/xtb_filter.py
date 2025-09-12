@@ -3,11 +3,13 @@ import sys, os, shutil
 import pickle
 from collections import defaultdict
 import itertools
-import chem
 import numpy as np
-import geometries
-from utils import shape
+
 from scipy.spatial.distance import cdist
+
+from MetalloGen import chem
+from MetalloGen import globalvars as gv
+from MetalloGen.utils import shape
 
 def main(args):
     # Arguments ...
@@ -143,8 +145,8 @@ def main(args):
         binding_vectors = np.array(binding_vectors)
         binding_vectors = binding_vectors / np.linalg.norm(binding_vectors, axis=1)[:, np.newaxis]
         CN = len(binding_vectors)
-        candidate_geometries = geometries.CN_known_geometry_dict[CN]
-        candidate_directions = {key: geometries.known_geometry_vector_dict[key] for key in candidate_geometries}
+        candidate_geometries = gv.CN_known_geometries_dict[CN]
+        candidate_directions = {key: gv.known_geometries_vector_dict[key] for key in candidate_geometries}
         min_rmsd = 1e6
         best_assigned_indices = None
         most_similar_geometry = None

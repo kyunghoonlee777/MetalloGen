@@ -1,13 +1,12 @@
 import process
 import sys, os, shutil
-from Calculator import orca, xtb_gaussian
-
+import cclib
 import numpy as np
-import geometries
 import pickle
 
-from utils import shape
-import cclib
+from MetalloGen import globalvars as gv
+from MetalloGen.utils import shape
+from MetalloGen.Calculator import orca, xtb_gaussian
 
 def write_output(content, new_atom_list, file_directory, om_info):
     n = len(new_atom_list)
@@ -131,7 +130,7 @@ def main(args):
         # Set charge and multiplicity ...
         element = metal_atom.get_element()
         element = element.lower().capitalize()
-        mult = geometries.metal_spin_dict[element] if element in geometries.metal_spin_dict else 0
+        mult = gv.metal_spin_dict[element] if element in gv.metal_spin_dict else 0
         z_sum = np.sum(z_list)
         e_sum = z_sum - chg
         if e_sum % 2 == 1:

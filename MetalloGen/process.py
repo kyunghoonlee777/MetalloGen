@@ -1,4 +1,3 @@
-
 """
 ---generate_molecule.py---
 Generate 2D graph molecule in ACE-Reaction format from xyz files or SMILES
@@ -12,15 +11,13 @@ import random
 
 from rdkit import Chem
 import rdkit.Chem.rdchem as rdchem
-
-import chem
-
-from utils import am
-from utils import frag
-from utils import compute_chg_and_bo_pulp as compute_pulp
-
 from scipy import spatial
 
+from MetalloGen import chem
+
+from MetalloGen.utils import am
+from MetalloGen.utils import frag
+from MetalloGen.utils import compute_chg_and_bo_pulp as compute_pulp
 
 def compute_bond_order_from_connectivity(molecule,chg,method = 'sum_of_fragments'):
     """ Returns bo_matrix by using heuristics (maxvalency and chg) for given total charge of molecule

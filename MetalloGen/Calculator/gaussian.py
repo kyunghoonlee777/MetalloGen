@@ -11,13 +11,11 @@ import numpy as np
 import distutils.spawn
 import shutil
 
-
 ### Module for reading gaussian files ###
 import cclib
 
 ### ace-reaction libraries ###
-import chem
-import process
+from MetalloGen import chem, process
 
 # Ugly fix for cclib error which occurs when 
 # only two rotational constants are given.
@@ -828,6 +826,3 @@ class Gaussian:
         # os.system(f'rm {file_directory}')
         # file_directory = os.path.join(working_directory,'test.log')
         # os.system(f'rm {file_directory}')
-
-
-

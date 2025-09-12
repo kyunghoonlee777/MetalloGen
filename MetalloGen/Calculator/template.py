@@ -14,8 +14,7 @@ import numpy as np
 import cclib
 
 ### ace-reaction libraries ###
-import chem
-import process
+from MetalloGen import chem, process
 
 '''
 You can define your own calculator, depending on your using software!!!

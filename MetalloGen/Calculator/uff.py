@@ -9,9 +9,7 @@ from rdkit.Chem.rdForceFieldHelpers import UFFOptimizeMolecule
 import rdkit.ForceField.rdForceField as FF
 
 ### ace-reaction libraries ###
-import chem
-import process
-
+from MetalloGen import chem, process
 
 def get_rd_mol_with_3D(ace_mol):
     pos = ace_mol.get_coordinate_list()

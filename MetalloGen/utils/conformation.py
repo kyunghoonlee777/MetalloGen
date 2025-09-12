@@ -3,8 +3,7 @@ import os
 
 from scipy.spatial.transform import Rotation
 
-import chem
-import process
+from MetalloGen import chem, process
 
 def sample_from_crest(molecule,working_directory = None,num_proc=1):
     if working_directory == None:

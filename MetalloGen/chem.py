@@ -9,15 +9,12 @@ from scipy import spatial
 import numpy as np
 import itertools
 
-from utils import make_smiles
-from utils import ic
-#from utils import compute_scipy
-
 from rdkit.Chem import AllChem
 from rdkit import Chem
 
-import process
-
+from MetalloGen.utils import make_smiles
+from MetalloGen.utils import ic
+from MetalloGen import process
 
 class Atom:
     """
@@ -467,9 +464,6 @@ class Atom:
     def __eq__(self,atom):
         return self.is_same_atom(atom)
 
-
-
-#bookmark - Jinwon Lee
          
 class Molecule:
     """
@@ -3041,6 +3035,3 @@ class Intermediate(Molecule):
         import os
         os.system('molden tmp.xyz')  
         os.system('rm tmp.xyz')
-
-
-

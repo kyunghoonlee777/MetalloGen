@@ -16,8 +16,8 @@ import numpy as np
 
 from scipy import spatial
 
-from utils import am
-from utils import make_smiles
+from MetalloGen.utils import am
+from MetalloGen.utils import make_smiles
 
 import chem
 

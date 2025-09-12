@@ -13,8 +13,7 @@ import numpy as np
 
 import cclib
 ### ace-reaction libraries ###
-import process
-import chem
+from MetalloGen import chem, process
 
 
 

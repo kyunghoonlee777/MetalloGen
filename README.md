@@ -64,19 +64,19 @@ Before using MetalloGen, following things should be prepared:
 You can run MetalloGen either via the installed console script:
 
 ```jsx
->> metallogen -s "[Ir+]|CP:1C|CP:2C|[Cl-:3]|[C-:4]#[O+]|4_square_planar" \
-              -wd "working_directory" \
-              -sd "save_directory" \
-              -r 1
+metallogen -s "[Ir+]|CP:1C|CP:2C|[Cl-:3]|[C-:4]#[O+]|4_square_planar" \
+           -wd "working_directory" \
+           -sd "save_directory" \
+           -r 1
 ```
 
 or via the Python module:
 
 ```jsx
->> python -m MetalloGen -s "[Ir+]|CP:1C|CP:2C|[Cl-:3]|[C-:4]#[O+]|4_square_planar" \
-                        -wd "working_directory" \
-                        -sd "save_directory" \
-                        -r 1
+python -m MetalloGen -s "[Ir+]|CP:1C|CP:2C|[Cl-:3]|[C-:4]#[O+]|4_square_planar" \
+                     -wd "working_directory" \
+                     -sd "save_directory" \
+                     -r 1
 ```
 
 ---

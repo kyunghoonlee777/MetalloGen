@@ -1,54 +1,90 @@
 # MetalloGen
 
-MetalloGen is a Python package for generating 3D structures of organometallic complexes.
+A Python package for generating 3D structures of organometallic complexes.
 
 ---
 
-## Installation
+# Requirements
 
-We recommend using **conda** for RDKit installation.
+- Python ≥ 3.9  
+- [NumPy](https://numpy.org/)
+- [SciPy](https://scipy.org/)
+- [cclib](https://cclib.github.io/)
+- [RDKit](https://www.rdkit.org/)
+- [PuLP](https://coin-or.github.io/pulp/)
 
-```bash
+---
+
+# Settings
+
+Before using MetalloGen, following things should be prepared:
+
+1. Quantum chemistry (QC) package should be configured. For example, if users want to use Guassian, either 'which g09', or 'which g16' should be correctly identified, as following:
+
+to use xtb-gaussian (whcih is our default method, ensure to 'xtbbin' 환경변수가 존재. echo $xtbbin
+/home/rxn_grp/programs/xtb-gaussian 이런식으로.)
+
+    ```jsx
+    >> which g09
+    >> /appl/g09.shchoi/G09Files/g09/g09
+    
+    >> which xtb
+    >> /home/rxn_grp/programs//xtb
+    ```
+
+2. If you want to use our **default method ('xtb-gaussian')**, you must set an environment variable **'xtbbin'** should be specified as following:
+
+    - You can obtain `xtb-gaussian` from the [Aspuru-Guzik Group GitHub repository](https://github.com/aspuru-guzik-group/xtb-gaussian).  
+    - After installation, set the environment variable:
+    ```jsx
+    >> export xtbbin="/home/rxn_grp/programs/xtb-gaussian"
+    ```
+    - Verify:
+    ```jsx
+    >> echo $xtbbin
+    >> /home/rxn_grp/programs/xtb-gaussian
+    ```
+
+# Installation
+
+```jsx
 # Clone the repository
-git clone https://github.com/<USERNAME>/MetalloGen.git
-cd MetalloGen
+>> git clone https://github.com/kyunghoonlee777/MetalloGen.git
+>> cd MetalloGen
 
-# Create environment (example: Python 3.10)
-conda create -n metallogen python=3.10 -y
-conda activate metallogen
-
-# Install RDKit (recommended fixed version for reproducibility)
-conda install -c conda-forge rdkit=2023.03.2 -y
+# Create environment
+>> conda create -n metallogen python=3.9 -y
+>> conda activate metallogen
 
 # Install MetalloGen
-pip install -e .
+>> pip install -e .
 ```
 
 ---
 
-## Usage
+## Executing MetalloGen
 
 You can run MetalloGen either via the installed console script:
 
-```bash
-metallogen -s "[Ir+]|CP:1C|CP:2C|[Cl-:3]|[C-:4]#[O+]|4_square_planar" \
-           -wd "working_directory" \
-           -sd "save_directory" \
-           -r 1
+```jsx
+>> metallogen -s "[Ir+]|CP:1C|CP:2C|[Cl-:3]|[C-:4]#[O+]|4_square_planar" \
+              -wd "working_directory" \
+              -sd "save_directory" \
+              -r 1
 ```
 
 or via the Python module:
 
-```bash
-python -m MetalloGen -s "[Ir+]|CP:1C|CP:2C|[Cl-:3]|[C-:4]#[O+]|4_square_planar" \
-                     -wd "working_directory" \
-                     -sd "save_directory" \
-                     -r 1
+```jsx
+>> python -m MetalloGen -s "[Ir+]|CP:1C|CP:2C|[Cl-:3]|[C-:4]#[O+]|4_square_planar" \
+                        -wd "working_directory" \
+                        -sd "save_directory" \
+                        -r 1
 ```
 
 ---
 
-## Command-line Arguments
+# Command-line Arguments
 
 The following options are available:
 
@@ -61,18 +97,7 @@ The following options are available:
 
 ---
 
-## Example
-
-```bash
-metallogen -s "[Ir+]|CP:1C|CP:2C|[Cl-:3]|[C-:4]#[O+]|4_square_planar" \
-           -wd "./scratch" \
-           -sd "./results" \
-           -r 1
-```
-
----
-
-## Output
+# Output
 
 Results will be saved in the directory specified by `--save_directory`.  
 Typical outputs include:
@@ -83,13 +108,12 @@ Typical outputs include:
 
 ---
 
-## Figures
+# License
 
-You can include sample output figures here (for example, molecular structures or energy profiles):
-
+This project is licensed under the BSD 3-Clause License.
 
 ---
 
-## License
+# Contact Information
 
-This project is licensed under the BSD 3-Clause License.
+Please e-mail me to here: [kyunghoonlee@kaist.ac.kr](mailto:kyunghoonlee@kaist.ac.kr) for more detail discussion

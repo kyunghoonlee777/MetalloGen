@@ -21,15 +21,12 @@ Before using MetalloGen, following things should be prepared:
 
 1. Quantum chemistry (QC) package should be configured. For example, if users want to use Guassian, either 'which g09', or 'which g16' should be correctly identified, as following:
 
-to use xtb-gaussian (whcih is our default method, ensure to 'xtbbin' 환경변수가 존재. echo $xtbbin
-/home/rxn_grp/programs/xtb-gaussian 이런식으로.)
-
     ```jsx
     >> which g09
     >> /appl/g09.shchoi/G09Files/g09/g09
     
     >> which xtb
-    >> /home/rxn_grp/programs//xtb
+    >> /home/rxn_grp/programs/xtb
     ```
 
 2. If you want to use our **default method ('xtb-gaussian')**, you must set an environment variable **'xtbbin'** should be specified as following:

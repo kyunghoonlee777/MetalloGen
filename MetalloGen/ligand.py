@@ -1,7 +1,7 @@
 from rdkit import Chem
 
 def get_ligand_from_smiles(mapped_smiles):
-    import process
+    from MetalloGen import process
     
     params = Chem.SmilesParserParams()
     params.removeHs = False

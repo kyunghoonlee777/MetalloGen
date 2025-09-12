@@ -274,7 +274,7 @@ class MetalComplex:
     
 def get_om_from_modified_smiles(smiles):
     from rdkit import Chem
-    import ligand
+    from MetalloGen import ligand
     
     smiles_list = smiles.split('|')
     

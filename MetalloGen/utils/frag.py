@@ -16,10 +16,9 @@ import numpy as np
 
 from scipy import spatial
 
+from MetalloGen import chem
 from MetalloGen.utils import am
 from MetalloGen.utils import make_smiles
-
-import chem
 
 visit=[] 
 visited_V=[]

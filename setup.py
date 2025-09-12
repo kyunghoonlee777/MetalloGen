@@ -25,6 +25,7 @@ setuptools.setup(
         "scipy",
         "cclib",
         "rdkit",
+        "pulp",
     ],
     entry_points={
         "console_scripts": [

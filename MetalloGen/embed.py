@@ -361,7 +361,7 @@ def get_embedding(metal_complex, scale=1.0, option=0, align=False, use_random=Tr
     direction_vector = new_complex.geometry_type.direction_vector
     params = rdDistGeom.EmbedParameters()
     params.useRandomCoords = True
-    params.maxAttempts = 100
+    params.maxIterations = 100
     params.useBasicKnowledge = False
     params.ignoreSmoothingFailures = True
 

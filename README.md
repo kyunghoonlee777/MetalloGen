@@ -63,6 +63,8 @@ Before using MetalloGen, following things should be prepared:
 
 MetalloGen uses a modified SMILES representation for **mononuclear coordination complexes**, called **m-SMILES**, as input. From an m-SMILES string, MetalloGen generates the corresponding 3D conformers.
 
+![image.png](figures/figure_1.png)
+
 The m-SMILES representation encodes:
 - the **metal center** (e.g., `[Zr+4]`),
 - the **ligands** as SMILES strings separated by vertical bars (`|`),
@@ -81,12 +83,16 @@ metallogen -s "[Zr+4]|[Cl-:2]|[Cl-:3]|[N:1]1=C(C[C-:4]2[CH:4]=[CH:4][CH:4]=[CH:4
 
 # Output
 
-Results will be saved in the directory specified by `--save_directory`.  
-Typical outputs include:
+When running MetalloGen, two types of output are generated:
 
-- Optimized 3D coordinates (`.xyz`, `.mol`, or `.sdf`)
-- Logs from quantum chemical calculations
-- Final relaxed structure (if `-r 1` is set)
+1. **Conformers**  
+   - Up to **10 candidate conformers** are generated for a given m-SMILES input.  
+   - These conformers differ by the initial embedding conditions used in the generation procedure.  
+   - Each conformer is saved as an **`result_{i}.xyz` file** in the directory specified by `--save_directory`.
+
+2. **Quantum chemical calculation logs**  
+   - If structural refinement is performed, all intermediate and final quantum chemical calculation outputs (e.g., Gaussian or xTB log files) are written to the directory specified by `--working_directory`.  
+   - These logs allow users to check convergence and inspect calculation details.
 
 ---
 

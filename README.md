@@ -63,7 +63,7 @@ Before using MetalloGen, following things should be prepared:
 
 MetalloGen uses a modified SMILES representation for **mononuclear coordination complexes**, called **m-SMILES**, as input. From an m-SMILES string, MetalloGen generates the corresponding 3D conformers.
 
-![image.png](figures/figure_1.png)
+![image.png](figures/example_msmiles.png)
 
 The m-SMILES representation encodes:
 - the **metal center** (e.g., `[Zr+4]`),
@@ -81,7 +81,9 @@ metallogen -s "[Zr+4]|[Cl-:2]|[Cl-:3]|[N:1]1=C(C[C-:4]2[CH:4]=[CH:4][CH:4]=[CH:4
 
 The generated 3D conformer corresponding to the m-SMILES input is shown below:
 
-![image.png](figures/figure_2.png)
+<p align="center">
+  <img src="figures/example_output.png" alt="MetalloGen output conformer" width="400">
+</p>
 
 ---
 

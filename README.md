@@ -24,7 +24,7 @@ Before using MetalloGen, following things should be prepared:
     ```jsx
     >> which g09
     >> /appl/g09.shchoi/G09Files/g09/g09
-    
+
     >> which xtb
     >> /home/rxn_grp/programs/xtb
     ```
@@ -61,36 +61,21 @@ Before using MetalloGen, following things should be prepared:
 
 ## Executing MetalloGen
 
+MetalloGen uses a modified SMILES representation for **mononuclear coordination complexes**, called **m-SMILES**, as input. From an m-SMILES string, MetalloGen generates the corresponding 3D conformers.
+
+The m-SMILES representation encodes:
+- the **metal center** (e.g., `[Zr+4]`),
+- the **ligands** as SMILES strings separated by vertical bars (`|`),
+- the **coordination geometry** (e.g., `5_trigonal_bipyramidal`).
+
+Donor atoms directly coordinated to the metal are specified with square brackets, and coordination sites are indicated with atom mapping numbers (e.g., `[Cl-:2]` means a chloro ligand bound at coordination site 2).  
+This representation makes it straightforward to encode complex polydentate and polyhapto ligands while preserving coordination geometry and stereochemistry.
+
 You can run MetalloGen either via the installed console script:
 
 ```jsx
-metallogen -s "[Ir+]|CP:1C|CP:2C|[Cl-:3]|[C-:4]#[O+]|4_square_planar" \
-           -wd "working_directory" \
-           -sd "save_directory" \
-           -r 1
+metallogen -s "[Zr+4]|[Cl-:2]|[Cl-:3]|[N:1]1=C(C[C-:4]2[CH:4]=[CH:4][CH:4]=[CH:4]2)C=CC=C1(C[C-:5]3[CH:5]=[CH:5][CH:5]=[CH:5]3)|5_trigonal_bipyramidal" -wd <WORKING DiRECTORY> -sd <SAVE DIRECTORY> -r 1
 ```
-
-or via the Python module:
-
-```jsx
-python -m MetalloGen -s "[Ir+]|CP:1C|CP:2C|[Cl-:3]|[C-:4]#[O+]|4_square_planar" \
-                     -wd "working_directory" \
-                     -sd "save_directory" \
-                     -r 1
-```
-
----
-
-# Command-line Arguments
-
-The following options are available:
-
-| Argument | Short | Type | Default | Description |
-|----------|-------|------|---------|-------------|
-| `--smiles` | `-s` | `str` | *required* | Input MSMILES string |
-| `--working_directory` | `-wd` | `str` | `None` | Scratch directory for running quantum chemical calculation |
-| `--save_directory` | `-sd` | `str` | `None` | Directory to save the results |
-| `--final_relax` | `-r` | `int` | `1` | Whether to perform final relaxation after generation (`0` = no, `1` = yes) |
 
 ---
 
@@ -102,6 +87,19 @@ Typical outputs include:
 - Optimized 3D coordinates (`.xyz`, `.mol`, or `.sdf`)
 - Logs from quantum chemical calculations
 - Final relaxed structure (if `-r 1` is set)
+
+---
+
+# Command-line Arguments
+
+The following options are available:
+
+| Argument | Short | Type | Default | Description |
+|----------|-------|------|---------|-------------|
+| `--smiles` | `-s` | `str` | *required* | Input MSMILES string |
+| `--working_directory` &nbsp;&nbsp;&nbsp;&nbsp;| `-wd` | `str` | `None` | Scratch directory for running quantum chemical calculation |
+| `--save_directory` | `-sd` | `str` | `None` | Directory to save the results |
+| `--final_relax` | `-r` | `int` | `1` | Whether to perform final relaxation after generation (`0` = no, `1` = yes) |
 
 ---
 

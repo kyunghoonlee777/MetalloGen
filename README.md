@@ -59,7 +59,7 @@ Before using MetalloGen, following things should be prepared:
 
 ---
 
-## Executing MetalloGen
+# Executing MetalloGen
 
 MetalloGen uses a modified SMILES representation for **mononuclear coordination complexes**, called **m-SMILES**, as input. From an m-SMILES string, MetalloGen generates the corresponding 3D conformers.
 
@@ -78,6 +78,10 @@ You can run MetalloGen either via the installed console script:
 ```jsx
 metallogen -s "[Zr+4]|[Cl-:2]|[Cl-:3]|[N:1]1=C(C[C-:4]2[CH:4]=[CH:4][CH:4]=[CH:4]2)C=CC=C1(C[C-:5]3[CH:5]=[CH:5][CH:5]=[CH:5]3)|5_trigonal_bipyramidal" -wd <WORKING DiRECTORY> -sd <SAVE DIRECTORY> -r 1
 ```
+
+The generated 3D conformer corresponding to the m-SMILES input is shown below:
+
+![image.png](figures/figure_2.png)
 
 ---
 

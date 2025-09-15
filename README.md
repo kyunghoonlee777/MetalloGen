@@ -129,13 +129,14 @@ MetalloGen successfully generates well-formed conformers from such SDF inputs as
 When running MetalloGen, two types of output are generated:
 
 1. **Conformers**  
-   - Up to **10 candidate conformers** are generated for a given m-SMILES input.  
-   - These conformers differ by the initial embedding conditions used in the generation procedure.  
+   - For each input, the number of conformers specified by the user (via the `-nc` option) are generated.
+   - These conformers differ by the initial embedding conditions used in the generation procedure.
    - Each conformer is saved as an **`result_{i}.xyz` file** in the directory specified by `--save_directory`.
 
 2. **Quantum chemical calculation logs**  
-   - If structural refinement is performed, all intermediate and final quantum chemical calculation outputs (e.g., Gaussian or xTB log files) are written to the directory specified by `--working_directory`.  
-   - These logs allow users to check convergence and inspect calculation details.
+   - During the conformer generation process, intermediate quantum chemical calculation outputs (e.g., Gaussian or xTB logs) are written to the directory specified by `--working_directory`.  
+   - For **final relaxation (`--final_relax`)**, both the **input files** and **log files** are saved in the directory specified by `--save_directory`.  
+   - This allows the final relaxed conformers and their corresponding QC results to be managed together in the same location.
 
 ---
 

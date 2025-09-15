@@ -146,7 +146,8 @@ The following options are available:
 
 | Argument | Short | Type | Default | Description |
 |----------|-------|------|---------|-------------|
-| `--smiles` | `-s` | `str` | *required* | Input MSMILES string |
+| `--smiles` | `-s` | `str` | `None` | Input MSMILES string |
+| `--input_directory` | `-id` | `str` | `None` | Input SDF/MOL file directory |
 | `--working_directory` &nbsp;&nbsp;&nbsp;&nbsp;| `-wd` | `str` | `None` | Scratch directory for running quantum chemical calculation |
 | `--save_directory` | `-sd` | `str` | `None` | Directory to save the results |
 | `--final_relax` | `-r` | `int` | `1` | Whether to perform final relaxation after generation (`0` = no, `1` = yes) |

@@ -103,7 +103,7 @@ The generated 3D conformer corresponding to the m-SMILES input is shown below:
 In some cases—such as **benchmarking with CSD (Cambridge Structural Database)**—obtaining an m-SMILES representation can be challenging or impractical.
 For these situations, MetalloGen can directly take **MOL** or **SDF** files as input via the `-id` flag. This allows seamless use of existing 3D structures extracted from databases.
 
-As an example, consider a complex extracted from the CSD with refcode **'TIMJUU'**.
+As an example, consider a complex extracted from the CSD with refcode **'CIXDAS'**.
 The corresponding 3D structure (in SDF format) can be provided directly to MetalloGen:
 
 <p align="center"> 

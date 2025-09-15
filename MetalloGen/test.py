@@ -7,10 +7,6 @@ import time
 import os
 import argparse
 import pickle
-import subprocess
-import shutil
-import glob
-from pathlib import Path
 
 import numpy as np
 from scipy.spatial.distance import cdist
@@ -19,23 +15,6 @@ from MetalloGen import globalvars as gv
 from MetalloGen import om, embed, clean_geometry
 
 from MetalloGen.Calculator import orca, gaussian
-
-
-def clean_working_directory(working_directory):
-    wd = Path(working_directory)
-    wildcard_patterns = ["Gau-*"]
-    file_names = ['energy','gradient','xtb','charges','xtbrestart','xtbtopo.mol']
-    for pattern in wildcard_patterns:
-        for file in wd.glob(pattern):
-            if file.is_file():
-                file.unlink()
-
-    # Remove exact-named files
-    for filename in file_names:
-        file = wd / filename
-        if file.exists() and file.is_file():
-            file.unlink()
-
 
 class TMCGenerator:
 
@@ -137,7 +116,6 @@ def main():
     parser.add_argument("--working_directory", "-wd", type=str, help="Scratch directory for running quantum chemical calculation", default=None)
     parser.add_argument("--save_directory", "-sd", type=str, help="Directory to save the results", default=None)
     parser.add_argument("--final_relax", "-r", type=int, help="Whether to perform final relaxation after generation", default=1)
-    parser.add_argument("--num_conformer", "-nc", type=int, help="Number of conformers", default=1)
 
     args = parser.parse_args()
 
@@ -167,14 +145,15 @@ def main():
     print(f"chg: {metal_complex.chg}")
     print(f"mult: {metal_complex.multiplicity}")
 
-    if args.num_conformer < 10:
-        scales = [0.70, 0.80, 0.90, 1.00, 1.10]
-    else:
-        scales = [0.7 + ((0.8 + 0.1*(args.num_conformer-10))/(args.num_conformer-2))*k for k in range(int(args.num_conformer/2))]
+    scales = [0.70, 0.80, 0.90, 1.00, 1.10]
     energy_criteria = 100.0
     num_trial = 1
     
     neighbor_list = metal_complex.get_distances_from_center()
+
+    gen_time_list = []
+    scan_time_list = []
+    relax_time_list = []
 
     num = 0
     initial_hessian = None
@@ -203,25 +182,24 @@ def main():
                 normal_termination = True
                  
                 if True:
-                    calculator.optimize_geometry(ace_mol, file_name=f"final_relax_{num}",initial_hessian=initial_hessian,save_directory=save_directory)
+                    calculator.optimize_geometry(ace_mol, file_name=f"final_relax_{num}",initial_hessian=initial_hessian)
                 else:
                     normal_termination = False
             
                 if not normal_termination:
                     if True:
-                        calculator.optimize_geometry(ace_mol, file_name=f"final_relax_{num}",initial_hessian=initial_hessian,save_directory=save_directory)
+                        calculator.optimize_geometry(ace_mol, file_name=f"final_relax_{num}",initial_hessian=initial_hessian)
                     else:
                         normal_termination = False
 
-                # Reset working directory                 
-                clean_working_directory(working_directory)
-                #os.system(f"/bin/rm {working_directory}/Gau-*")
-                #os.system(f"/bin/rm {working_directory}/energy")
-                #os.system(f"/bin/rm {working_directory}/gradient")
-                #os.system(f"/bin/rm {working_directory}/wbo")
-                #os.system(f"/bin/rm {working_directory}/charges")
-                #os.system(f"/bin/rm {working_directory}/xtbrestart")
-                #os.system(f"/bin/rm {working_directory}/xtbtopo.mol")
+                # Reset working directory
+                os.system(f"/bin/rm {working_directory}/Gau-*")
+                os.system(f"/bin/rm {working_directory}/energy")
+                os.system(f"/bin/rm {working_directory}/gradient")
+                os.system(f"/bin/rm {working_directory}/wbo")
+                os.system(f"/bin/rm {working_directory}/charges")
+                os.system(f"/bin/rm {working_directory}/xtbrestart")
+                os.system(f"/bin/rm {working_directory}/xtbtopo.mol")
                 relaxed_energy = ace_mol.energy
                 print ("Energy:", relaxed_energy)
                 chg = ace_mol.chg
@@ -233,6 +211,9 @@ def main():
                 ace_mol.print_coordinate_list()
                 print()
 
+                gen_time_list.append(gen_times[k])
+                scan_time_list.append(scan_times[k])
+
                
                 if not normal_termination:
                     print("Relaxation failed ...")
@@ -242,6 +223,8 @@ def main():
                     print ("Relaxation success!")
                     num += 1
                     success = True
+                    relax_et = time.time()
+                    relax_time_list.append(relax_et - relax_st)
 
                 if save_directory:
                     conf_save_directory = os.path.join(save_directory,f"result_{num}.xyz")
@@ -251,11 +234,12 @@ def main():
                 break
 
         print("======================================================\n")
-        if num >= args.num_conformer:
-            break
-
+        
     if num > 0:
         print ("Success: True")
+        print (f"Average embedding time:  {np.mean(gen_time_list):<20}")
+        print (f"Average cleaning time:   {np.mean(scan_time_list):<20}")
+        print (f"Average relaxation time: {np.mean(relax_time_list):<20}")
     else:
         print ("Success: False")
         

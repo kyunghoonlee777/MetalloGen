@@ -114,6 +114,7 @@ The following options are available:
 | `--working_directory` &nbsp;&nbsp;&nbsp;&nbsp;| `-wd` | `str` | `None` | Scratch directory for running quantum chemical calculation |
 | `--save_directory` | `-sd` | `str` | `None` | Directory to save the results |
 | `--final_relax` | `-r` | `int` | `1` | Whether to perform final relaxation after generation (`0` = no, `1` = yes) |
+| `--num_conformer` | `-nc` | `int` | `1` | Number of conformers to generate |
 
 ---
 

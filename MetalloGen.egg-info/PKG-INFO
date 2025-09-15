@@ -1,3 +1,31 @@
+Metadata-Version: 2.4
+Name: MetalloGen
+Version: 0.0.1
+Summary: A package for generating metal complexes
+Author: Kyunghoon Lee et al.
+License: BSD-3-Clause
+Classifier: Development Status :: 3 - Alpha
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: numpy
+Requires-Dist: scipy
+Requires-Dist: cclib
+Requires-Dist: rdkit
+Requires-Dist: pulp
+Dynamic: author
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: license
+Dynamic: license-file
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
 # MetalloGen
 
 A Python package for generating 3D structures of organometallic complexes.
@@ -78,7 +106,7 @@ This representation makes it straightforward to encode complex polydentate and p
 You can run MetalloGen either via the installed console script:
 
 ```jsx
-metallogen -s "[Zr+4]|[Cl-:2]|[Cl-:3]|[N:1]1=C(C[C-:4]2[CH:4]=[CH:4][CH:4]=[CH:4]2)C=CC=C1(C[C-:5]3[CH:5]=[CH:5][CH:5]=[CH:5]3)|5_trigonal_bipyramidal" -wd <WORKING DiRECTORY> -sd <SAVE DIRECTORY> -r 1 -nc 1
+metallogen -s "[Zr+4]|[Cl-:2]|[Cl-:3]|[N:1]1=C(C[C-:4]2[CH:4]=[CH:4][CH:4]=[CH:4]2)C=CC=C1(C[C-:5]3[CH:5]=[CH:5][CH:5]=[CH:5]3)|5_trigonal_bipyramidal" -wd <WORKING DiRECTORY> -sd <SAVE DIRECTORY> -r 1
 ```
 
 The generated 3D conformer corresponding to the m-SMILES input is shown below:
@@ -114,7 +142,6 @@ The following options are available:
 | `--working_directory` &nbsp;&nbsp;&nbsp;&nbsp;| `-wd` | `str` | `None` | Scratch directory for running quantum chemical calculation |
 | `--save_directory` | `-sd` | `str` | `None` | Directory to save the results |
 | `--final_relax` | `-r` | `int` | `1` | Whether to perform final relaxation after generation (`0` = no, `1` = yes) |
-| `--num_conformer` | `-nc` | `int` | `1` | Number of conformers to generate |
 
 ---
 

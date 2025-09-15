@@ -203,13 +203,13 @@ def main():
                 normal_termination = True
                  
                 if True:
-                    calculator.optimize_geometry(ace_mol, file_name=f"final_relax_{num}",initial_hessian=initial_hessian,save_directory=save_directory)
+                    calculator.optimize_geometry(ace_mol, file_name=f"final_relax_{num+1}",initial_hessian=initial_hessian,save_directory=save_directory)
                 else:
                     normal_termination = False
             
                 if not normal_termination:
                     if True:
-                        calculator.optimize_geometry(ace_mol, file_name=f"final_relax_{num}",initial_hessian=initial_hessian,save_directory=save_directory)
+                        calculator.optimize_geometry(ace_mol, file_name=f"final_relax_{num+1}",initial_hessian=initial_hessian,save_directory=save_directory)
                     else:
                         normal_termination = False
 
@@ -247,6 +247,10 @@ def main():
                     conf_save_directory = os.path.join(save_directory,f"result_{num}.xyz")
                     with open(conf_save_directory, "w") as f:
                         f.write(content)
+
+                if num >= args.num_conformer:
+                    break
+
             if success:
                 break
 

@@ -134,6 +134,7 @@ def main():
         description="Generate 3D structure of organometallic complex"
     )
     parser.add_argument("--smiles", "-s", type=str, help="Input MSMILES string")
+    parser.add_argument("--input_directory", "-id", type=str, help="Input sdf directory")
     parser.add_argument("--working_directory", "-wd", type=str, help="Scratch directory for running quantum chemical calculation", default=None)
     parser.add_argument("--save_directory", "-sd", type=str, help="Directory to save the results", default=None)
     parser.add_argument("--final_relax", "-r", type=int, help="Whether to perform final relaxation after generation", default=1)

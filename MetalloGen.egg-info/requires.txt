@@ -1,5 +1,0 @@
-numpy
-scipy
-cclib
-rdkit
-pulp

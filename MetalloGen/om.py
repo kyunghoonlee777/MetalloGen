@@ -3,7 +3,7 @@ import copy
 
 from MetalloGen import embed
 from MetalloGen import globalvars as gv
-from MetalloGen import chem, process
+from MetalloGen import chem, process, ligand
 
 class Geometry:
     
@@ -105,7 +105,6 @@ class MetalComplex:
                 adj_matrix[i][metal_index] = 1
         return adj_matrix
 
-
     def get_atom_list(self):
         metal_index = self.metal_index
         ligands = self.ligands
@@ -127,7 +126,6 @@ class MetalComplex:
                 
         return atom_list
 
-
     def get_molecule(self):
         molecule = chem.Molecule()
         chg = self.chg
@@ -144,12 +142,10 @@ class MetalComplex:
         
         return molecule
 
-
     def get_position(self):
         atom_list = self.get_atom_list()
         positions = [[atom.x, atom.y, atom.z] for atom in atom_list]
         return np.array(positions)
-    
     
     def set_position(self,positions):
         #CAUTION: positions should be in the order of atom_list
@@ -168,7 +164,6 @@ class MetalComplex:
             ligand = ligands[i]
             for j in range(len(atom_indices)):
                 process.locate_atom(ligand.molecule.atom_list[j],positions[atom_indices[j]])
-            
 
     def copy(self):
         geometry_name = self.geometry_type.geometry_name
@@ -271,6 +266,109 @@ class MetalComplex:
             atom_set = next_set
             distance += 1
         return neighbor_list
+
+
+def replace_actinide(metal_complex):
+    metal_atom = metal_complex.center_atom
+    metal_atom = metal_atom.get_element().lower().capitalize()
+    if metal_atom in gv.actinide_metal:
+        metal_complex.is_actinide = True
+        index = gv.actinide_metal.index(metal_atom)
+        corresponding_lanthanide = gv.lanthanide_metal[index]
+        metal_complex.center_atom.set_element(corresponding_lanthanide)
+
+def construct_metal_complex(z_list,adj_matrix,geometry_name=None):
+    metal_index = None
+    for i,atomic_num in enumerate(z_list):
+        if atomic_num in gv.metal_z_list:
+            metal_index = i
+            break
+    if metal_index is None:
+        print('Metal was not found !!!')
+        exit()
+        
+    broken_adj_matrix = np.copy(adj_matrix)
+    ligands = []
+    binding_sites = []
+
+    n = len(z_list)
+
+    # Cut all the bonds between metals and obtain binding sites ...
+    for i in range(n):
+        if broken_adj_matrix[metal_index][i] > 0:
+            binding_sites.append(i)
+            broken_adj_matrix[metal_index][i] = broken_adj_matrix[i][metal_index] = 0.0
+
+    groups = process.group_molecules(broken_adj_matrix) 
+    order = 0
+    atom_indices_for_each_ligand = []
+    # Make ligands from broken and original
+    
+    for group in groups:
+        if metal_index in group:
+            continue
+        group.sort()
+        atom_indices_for_each_ligand.append(group)
+        ligand_atom_list = [chem.Atom(z_list[i]) for i in group]
+        chg = 0
+        if len(group) > 1:
+            reduce_function = {group[i]:i for i in range(len(group))}
+            index_function = np.ix_(group,group)
+            ligand_adj_matrix = adj_matrix[index_function]
+            # Find binding indices for given ligand
+            binding_indices = [i for i in group if i in binding_sites]
+            #print('Binding indices:',binding_indices)
+            index_function = np.ix_(binding_indices,binding_indices)
+            sub_adj_matrix = adj_matrix[index_function]
+            ligand_binding_groups = process.group_molecules(sub_adj_matrix)
+            #print('Ligand binding groups:',ligand_binding_groups)
+            chg = -len(ligand_binding_groups)
+            order += len(ligand_binding_groups)
+            #print('Binding indices:',binding_indices)
+            binding_indices = [reduce_function[i] for i in binding_indices]
+            binding_indices = group_binding_sites(binding_indices,ligand_adj_matrix)
+        else:
+            # Single atom binding ligand ...
+            ligand_adj_matrix = np.zeros((1,1))
+            chg = -1
+            binding_indices = [[0]]
+            order += 1
+
+        # Identify order for binding sites
+        # Make ligand molecule
+        ligand_molecule = chem.Molecule()
+        ligand_molecule.atom_list = ligand_atom_list
+        ligand_molecule.adj_matrix = ligand_adj_matrix
+        ligand_molecule.chg = chg
+        ligand_molecule.multiplicity = 1
+        
+        chg_list, bo_matrix = process.get_chg_and_bo(ligand_molecule, ligand_molecule.chg)
+        
+        ligand_molecule.set_atom_feature(chg_list, 'chg')
+        ligand_molecule.chg_list = chg_list
+        ligand_molecule.bo_matrix = bo_matrix
+        
+        binding_infos = [[i, None] for i in binding_indices]
+
+        ligands.append(ligand.Ligand(ligand_molecule,binding_infos))
+
+    center_atom = chem.Atom(z_list[metal_index])
+    
+    chg = None
+    multiplicity = None
+    metal_complex = None
+    
+    if geometry_name is None:
+        print('Geometry not specified')
+        exit()
+            
+    print('Geometry:',geometry_name)
+
+    metal_complex = om.MetalComplex(geometry_name,center_atom,ligands,chg,multiplicity)
+    metal_complex.metal_index = metal_index
+    metal_complex.atom_indices_for_each_ligand = atom_indices_for_each_ligand
+
+    return metal_complex
     
 def get_om_from_modified_smiles(smiles):
     from rdkit import Chem
@@ -295,8 +393,66 @@ def get_om_from_modified_smiles(smiles):
     metal_complex = MetalComplex(geometry_name,metal_atom,ligands,chg,multiplicity)
     metal_complex.metal_index = 0
     metal_complex.multiplicity = multiplicity
+    replace_actinide(metal_complex)
 
     return metal_complex
-            
+
+def get_om_from_sdf(sdf_directory):
+    from MetalloGen.utils import shape
+
+    z_list, coords, adj_matrix, chg_list, metal_index = process.get_molecule_info_from_sdf(sdf_directory)
+    
+    if metal_index is None:
+        print("Failed to assign the index of metal atom from the sdf file ...")
+        exit()
+
+    binding_sites = [i for i in range(len(z_list)) if adj_matrix[metal_index][i] > 0]
+    binding_vectors = [coords[i] - coords[metal_index] for i in binding_sites]
+
+    coord_num = len(binding_sites)
+    candidate_geometries = gv.CN_known_geometries_dict[coord_num]
+    candidate_directions = [gv.known_geometries_vector_dict[geometry] for geometry in candidate_geometries]
+
+    min_rmsd = 100000.0
+    best_geometry = None
+    best_assigned_indices = None
+    for i in range(len(candidate_directions)):
+        direction_vectors = candidate_directions[i]
+        rmsd, assigned_indices = shape.shape_measure(binding_vectors, direction_vectors)
+        if rmsd < min_rmsd:
+            min_rmsd = rmsd
+            best_assigned_indices = assigned_indices
+            best_geometry = candidate_shape[i]
+
+    if best_geometry is None:
+        print("Failed to get geometry from the sdf file ...")
+        exit()
+
+    metal_complex = construct_metal_complex(z_list,adj_matrix,best_geometry)
+    replace_actinide(metal_complex)
+    
+    chg = int(np.sum(chg_list))
+    metal_complex.chg = chg
+    metal_atom = metal_complex.center_atom.get_element().lower().capitalize()
+    mult = gv.metal_spin_dict[metal_atom] if metal_atom in gv.metal_spin_dict else 0
+    z_sum = sum(z_list)
+    e_sum = z_sum - chg
+    f e_sum % 2 == 1: 
+        if mult == 0:
+            mult = 1
+        elif mult < 7 and mult % 2 == 0:
+            mult += 1
+        elif mult >= 7 and mult % 2 == 0:
+            mult -= 1
+    if e_sum % 2 == 0 and mult % 2 == 1:
+        mult -= 1
+    elif e_sum % 2 == 1 and mult % 2 == 0:
+        mult += 1
+    mult += 1
+    metal_complex.multiplicity = mult
+
+    return metal_complex
+
+
 if __name__ == "__main__":
     pass

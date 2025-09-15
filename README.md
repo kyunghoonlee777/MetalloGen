@@ -107,7 +107,7 @@ As an example, consider a complex extracted from the CSD with refcode **'TIMJUU'
 The corresponding 3D structure (in SDF format) can be provided directly to MetalloGen:
 
 <p align="center"> 
-  <img src="figures/sdf.png" alt="CSD-extracted SDF structure" width="600"> 
+  <img src="figures/sdf.png" alt="CSD-extracted SDF structure" width="400"> 
 </p>
 
 **Example (SDF input):**
@@ -119,7 +119,7 @@ metallogen -id <INPUT DIRECTORY> -wd <WORKING DIRECTORY> -sd <SAVE DIRECTORY> -r
 MetalloGen successfully generates well-formed conformers from such SDF inputs as well:
 
 <p align="center"> 
-  <img src="figures/sdf_output.png" alt="MetalloGen output from SDF" width="400"> 
+  <img src="figures/sdf_output.png" alt="MetalloGen output from SDF" width="600"> 
 </p>
 
 ---

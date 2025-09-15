@@ -73,7 +73,7 @@ MetalloGen can be executed with two types of inputs:
 MetalloGen uses a modified SMILES representation called **m-SMILES** as input. From an m-SMILES string, MetalloGen generates the corresponding 3D conformers.
 
 <p align="center">
-  <img src="figures/example_msmiles.png" alt="m-SMILES encoding" width="600">
+  <img src="figures/msmiles.png" alt="m-SMILES encoding" width="600">
 </p>
 
 The m-SMILES representation encodes:
@@ -93,7 +93,7 @@ metallogen -s "[Zr+4]|[Cl-:2]|[Cl-:3]|[N:1]1=C(C[C-:4]2[CH:4]=[CH:4][CH:4]=[CH:4
 The generated 3D conformer corresponding to the m-SMILES input is shown below:
 
 <p align="center">
-  <img src="figures/example_msmiles_output.png" alt="MetalloGen output conformer" width="400">
+  <img src="figures/msmiles_output.png" alt="MetalloGen output conformer" width="400">
 </p>
 
 ---
@@ -119,7 +119,7 @@ metallogen -id <INPUT DIRECTORY> -wd <WORKING DIRECTORY> -sd <SAVE DIRECTORY> -r
 MetalloGen successfully generates well-formed conformers from such SDF inputs as well:
 
 <p align="center"> 
-  <img src="figures/example_sdf_output.png" alt="MetalloGen output from SDF" width="400"> 
+  <img src="figures/sdf_output.png" alt="MetalloGen output from SDF" width="400"> 
 </p>
 
 ---

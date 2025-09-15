@@ -1,0 +1,2 @@
+metallogen -id /home/rxn_grp/MetalloGen/examples/sdf_examples/CIXDAS/CIXDAS.sdf -wd /home/rxn_grp/scratch/metallogen_test/ -sd /home/rxn_grp/MetalloGen/examples/sdf_examples/CIXDAS/ -r 1 -nc 1
+metallogen -id /home/rxn_grp/MetalloGen/examples/sdf_examples/TIMJUU/TIMJUU.sdf -wd /home/rxn_grp/scratch/metallogen_test/ -sd /home/rxn_grp/MetalloGen/examples/sdf_examples/TIMJUU/ -r 1 -nc 1

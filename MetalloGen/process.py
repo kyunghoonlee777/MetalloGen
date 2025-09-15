@@ -1410,13 +1410,13 @@ def get_molecule_info_from_sdf(sdf_directory):
         lines = f.readlines()
 
     # First, get the number of atoms
-    n_atoms = int(line[3][:3].strip())
-    n_bonds = int(line[3][3:6].strip())
+    n_atoms = int(lines[3].split()[0])
+    n_bonds = int(lines[3].split()[1])
 
     z_list = []
     coords = []
-    adj_matrix = np.zeros((n,n))
-    chg_info = dict()
+    adj_matrix = np.zeros((n_atoms,n_atoms))
+    chg_list = np.zeros(n_atoms)
     metal_index = None
 
     for i in range(n_atoms):
@@ -1426,30 +1426,32 @@ def get_molecule_info_from_sdf(sdf_directory):
         z = float(line[2])
         element = line[3]
         coords.append([x,y,z])
-        z_list.append(element)
+        z_list.append(chem.Atom(element).get_atomic_number())
         if element in gv.metal:
             metal_index = i
     for i in range(n_bonds):
         line = lines[4+n_atoms+i].split()
         s, e = line[0], line[1]
-        if s > n_atoms:
+        s_ = int(s.strip())
+        if s_ > n_atoms:
             tmp = s
             s = tmp[:3].strip()
             e = tmp[3:].strip()
         if not s.isdigit() or not e.isdigit():
             print("WRONG SDF; Error occurs during parsing bond block ...")
-        s = int(s)
-        e = int(e)
+        s = int(s)-1
+        e = int(e)-1
         adj_matrix[s][e] = 1
         adj_matrix[e][s] = 1
-    chg_line = lines[4+n_atoms+n_bonds].strip().split()
-    n_chg = int(chg_line[2])
-    for i in range(n_chg):
-        idx = int(chg_line[3+2*i]) - 1
-        chg = int(chg_line[4+2*i])
-        chg_info[idx] = chg
+    chg_line = lines[4+n_atoms+n_bonds]
+    if 'CHG' in chg_line:
+        chg_line = chg_line.strip().split()
+        n_chg = int(chg_line[2])
+        for i in range(n_chg):
+            idx = int(chg_line[3+2*i]) - 1
+            chg = int(chg_line[4+2*i])
+            chg_list[idx] = chg
     
     coords = np.array(coords)
 
     return z_list, coords, adj_matrix, chg_list, metal_index
-        

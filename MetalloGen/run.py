@@ -134,7 +134,7 @@ def main():
         description="Generate 3D structure of organometallic complex"
     )
     parser.add_argument("--smiles", "-s", type=str, help="Input MSMILES string")
-    parser.add_argument("--input_directory", "-id", type=str, help="Input sdf directory")
+    parser.add_argument("--input_directory", "-id", type=str, help="Input MOL/SDF file directory")
     parser.add_argument("--working_directory", "-wd", type=str, help="Scratch directory for running quantum chemical calculation", default=None)
     parser.add_argument("--save_directory", "-sd", type=str, help="Directory to save the results", default=None)
     parser.add_argument("--final_relax", "-r", type=int, help="Whether to perform final relaxation after generation", default=1)
@@ -142,9 +142,10 @@ def main():
 
     args = parser.parse_args()
 
+    smiles = args.smiles
+    input_directory = args.input_directory
     working_directory = args.working_directory
     save_directory = args.save_directory
-    smiles = args.smiles
 
     if save_directory is not None:
         os.makedirs(save_directory, exist_ok=True)
@@ -152,10 +153,12 @@ def main():
         os.makedirs(working_directory, exist_ok=True)
 
     # Metal complex generation based on MSMILES
-    if smiles is not None and "|" in smiles:
+    if smiles and "|" in smiles:
         metal_complex = om.get_om_from_modified_smiles(smiles)
-    else: 
-        raise Exception("Please provide MSMILES string ...")
+    elif input_directory:
+        metal_complex = om.get_om_from_sdf(input_directory)
+    else:
+        raise Exception("Please provide either MSMILES string or MOL/SDF file directory ...")
 
     # Set up the calculator
     #calculator = orca.Orca()
@@ -163,7 +166,11 @@ def main():
     calculator.switch_to_xtb_gaussian()
     calculator.change_working_directory(working_directory)
 
-    print(f"MSMILES: {smiles}")
+    if smiles:
+        print(f"MSMILES: {smiles}")
+    else:
+        file_name = os.path.basename(input_directory)
+        print(f"Input file: {file_name}")
     print(f"num atoms: {len(metal_complex.get_atom_list())}")
     print(f"chg: {metal_complex.chg}")
     print(f"mult: {metal_complex.multiplicity}")

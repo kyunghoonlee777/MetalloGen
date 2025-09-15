@@ -4,6 +4,7 @@ import copy
 from MetalloGen import embed
 from MetalloGen import globalvars as gv
 from MetalloGen import chem, process, ligand
+from MetalloGen.utils import shape
 
 class Geometry:
     
@@ -277,6 +278,29 @@ def replace_actinide(metal_complex):
         corresponding_lanthanide = gv.lanthanide_metal[index]
         metal_complex.center_atom.set_element(corresponding_lanthanide)
 
+def group_binding_sites(binding_indices,adj_matrix):
+    all_set = set(binding_indices)
+    group_list = []
+    index = binding_indices[0]
+    while len(all_set) > 0:
+        molecule_indices = set([index])
+        current_indices = set([index])
+        while len(current_indices) > 0:
+            next_indices = set()
+            for i in current_indices:
+                for j in binding_indices:
+                    if adj_matrix[i][j] == 1:
+                        next_indices.add(j)
+            current_indices = next_indices - molecule_indices
+            molecule_indices = molecule_indices.union(current_indices)
+        all_set = all_set - molecule_indices
+        group_list.append(list(molecule_indices))
+        if len(all_set) > 0:
+            index = list(all_set)[0]
+        else:
+            break
+    return group_list
+
 def construct_metal_complex(z_list,adj_matrix,geometry_name=None):
     metal_index = None
     for i,atomic_num in enumerate(z_list):
@@ -302,7 +326,6 @@ def construct_metal_complex(z_list,adj_matrix,geometry_name=None):
     groups = process.group_molecules(broken_adj_matrix) 
     order = 0
     atom_indices_for_each_ligand = []
-    # Make ligands from broken and original
     
     for group in groups:
         if metal_index in group:
@@ -317,14 +340,11 @@ def construct_metal_complex(z_list,adj_matrix,geometry_name=None):
             ligand_adj_matrix = adj_matrix[index_function]
             # Find binding indices for given ligand
             binding_indices = [i for i in group if i in binding_sites]
-            #print('Binding indices:',binding_indices)
             index_function = np.ix_(binding_indices,binding_indices)
             sub_adj_matrix = adj_matrix[index_function]
             ligand_binding_groups = process.group_molecules(sub_adj_matrix)
-            #print('Ligand binding groups:',ligand_binding_groups)
             chg = -len(ligand_binding_groups)
             order += len(ligand_binding_groups)
-            #print('Binding indices:',binding_indices)
             binding_indices = [reduce_function[i] for i in binding_indices]
             binding_indices = group_binding_sites(binding_indices,ligand_adj_matrix)
         else:
@@ -361,14 +381,47 @@ def construct_metal_complex(z_list,adj_matrix,geometry_name=None):
     if geometry_name is None:
         print('Geometry not specified')
         exit()
-            
-    print('Geometry:',geometry_name)
 
-    metal_complex = om.MetalComplex(geometry_name,center_atom,ligands,chg,multiplicity)
+    metal_complex = MetalComplex(geometry_name,center_atom,ligands,chg,multiplicity)
     metal_complex.metal_index = metal_index
     metal_complex.atom_indices_for_each_ligand = atom_indices_for_each_ligand
 
     return metal_complex
+
+def set_stereochemistry(metal_complex, coord_list):
+    metal_index = metal_complex.metal_index
+    ligands = metal_complex.ligands
+    atom_indices_for_each_ligand = metal_complex.atom_indices_for_each_ligand
+    
+    binding_vectors = []
+    binding_info_list = []
+    for i, ligand in enumerate(ligands):
+        atom_indices = atom_indices_for_each_ligand[i]
+        binding_infos = ligand.binding_infos
+        for binding_info in binding_infos:
+            binding_indices = binding_info[0]
+            binding_vector = np.zeros(3)
+            for idx in binding_indices:
+                v = coord_list[atom_indices[idx]]
+                binding_vector += (v - coord_list[metal_index])
+            binding_vector /= np.linalg.norm(binding_vector)
+            binding_vectors.append(binding_vector)
+            binding_info_list.append(binding_info)
+    binding_vectors = np.array(binding_vectors)
+    direction_vectors = np.array(metal_complex.geometry_type.direction_vector)
+    
+    _, best_assigned_indices = shape.shape_measure(binding_vectors, direction_vectors)
+        
+    if best_assigned_indices is None:
+        print('Failed to set stereochemistry')
+        exit()
+        
+    for idx, binding_info in enumerate(binding_info_list):
+        binding_info[1] = best_assigned_indices[idx] + 1
+        
+    print('Successfully set stereochemistry')
+
+    return
     
 def get_om_from_modified_smiles(smiles):
     from rdkit import Chem
@@ -398,9 +451,15 @@ def get_om_from_modified_smiles(smiles):
     return metal_complex
 
 def get_om_from_sdf(sdf_directory):
-    from MetalloGen.utils import shape
-
     z_list, coords, adj_matrix, chg_list, metal_index = process.get_molecule_info_from_sdf(sdf_directory)
+
+    print("====================ADJACENCY MATRIX====================")
+    n_atoms = len(z_list)
+    for i in range(n_atoms):
+        for j in range(n_atoms):
+            print(int(adj_matrix[i][j]), end=' ')
+        print()
+    print("========================================================")
     
     if metal_index is None:
         print("Failed to assign the index of metal atom from the sdf file ...")
@@ -422,13 +481,14 @@ def get_om_from_sdf(sdf_directory):
         if rmsd < min_rmsd:
             min_rmsd = rmsd
             best_assigned_indices = assigned_indices
-            best_geometry = candidate_shape[i]
+            best_geometry = candidate_geometries[i]
 
     if best_geometry is None:
         print("Failed to get geometry from the sdf file ...")
         exit()
 
     metal_complex = construct_metal_complex(z_list,adj_matrix,best_geometry)
+    set_stereochemistry(metal_complex, coords)
     replace_actinide(metal_complex)
     
     chg = int(np.sum(chg_list))
@@ -437,7 +497,7 @@ def get_om_from_sdf(sdf_directory):
     mult = gv.metal_spin_dict[metal_atom] if metal_atom in gv.metal_spin_dict else 0
     z_sum = sum(z_list)
     e_sum = z_sum - chg
-    f e_sum % 2 == 1: 
+    if e_sum % 2 == 1: 
         if mult == 0:
             mult = 1
         elif mult < 7 and mult % 2 == 0:

@@ -61,30 +61,65 @@ Before using MetalloGen, following things should be prepared:
 
 # Executing MetalloGen
 
-MetalloGen uses a modified SMILES representation for **mononuclear coordination complexes**, called **m-SMILES**, as input. From an m-SMILES string, MetalloGen generates the corresponding 3D conformers.
+MetalloGen can be executed with two types of inputs:
+
+1. **m-SMILES representation** (modified SMILES for mononuclear coordination complexes)  
+2. **MOL/SDF files** containing predefined molecular structures
+
+---
+
+## 1. Using m-SMILES
+
+MetalloGen uses a modified SMILES representation called **m-SMILES** as input. From an m-SMILES string, MetalloGen generates the corresponding 3D conformers.
 
 <p align="center">
   <img src="figures/example_msmiles.png" alt="m-SMILES encoding" width="600">
 </p>
 
 The m-SMILES representation encodes:
-- the **metal center** (e.g., `[Zr+4]`),
-- the **ligands** as SMILES strings separated by vertical bars (`|`),
-- the **coordination geometry** (e.g., `5_trigonal_bipyramidal`).
+- the **metal center** (e.g., `[Zr+4]`)
+- the **ligands** as SMILES strings separated by vertical bars (`|`)
+- the **coordination geometry** (e.g., `5_trigonal_bipyramidal`)
 
 Donor atoms directly coordinated to the metal are specified with square brackets, and coordination sites are indicated with atom mapping numbers (e.g., `[Cl-:2]` means a chloro ligand bound at coordination site 2).  
-This representation makes it straightforward to encode complex polydentate and polyhapto ligands while preserving coordination geometry and stereochemistry.
+This makes it straightforward to encode polydentate and polyhapto ligands while preserving coordination geometry and stereochemistry.
 
-You can run MetalloGen either via the installed console script:
+**Example (m-SMILES input):**
 
 ```jsx
-metallogen -s "[Zr+4]|[Cl-:2]|[Cl-:3]|[N:1]1=C(C[C-:4]2[CH:4]=[CH:4][CH:4]=[CH:4]2)C=CC=C1(C[C-:5]3[CH:5]=[CH:5][CH:5]=[CH:5]3)|5_trigonal_bipyramidal" -wd <WORKING DiRECTORY> -sd <SAVE DIRECTORY> -r 1 -nc 1
+metallogen -s "[Zr+4]|[Cl-:2]|[Cl-:3]|[N:1]1=C(C[C-:4]2[CH:4]=[CH:4][CH:4]=[CH:4]2)C=CC=C1(C[C-:5]3[CH:5]=[CH:5][CH:5]=[CH:5]3)|5_trigonal_bipyramidal" -wd <WORKING DIRECTORY> -sd <SAVE DIRECTORY> -r 1 -nc 1
 ```
 
 The generated 3D conformer corresponding to the m-SMILES input is shown below:
 
 <p align="center">
-  <img src="figures/example_output.png" alt="MetalloGen output conformer" width="400">
+  <img src="figures/example_msmiles_output.png" alt="MetalloGen output conformer" width="400">
+</p>
+
+---
+
+## 2. Using MOL/SDF files
+
+In some cases—such as **benchmarking with CSD (Cambridge Structural Database)**—obtaining an m-SMILES representation can be challenging or impractical.
+For these situations, MetalloGen can directly take **MOL** or **SDF** files as input via the `-id` flag. This allows seamless use of existing 3D structures extracted from databases.
+
+As an example, consider a complex extracted from the CSD with refcode **'TIMJUU'**.
+The corresponding 3D structure (in SDF format) can be provided directly to MetalloGen:
+
+<p align="center"> 
+  <img src="figures/sdf.png" alt="CSD-extracted SDF structure" width="600"> 
+</p>
+
+**Example (SDF input):**
+
+```jsx
+metallogen -id <INPUT DIRECTORY> -wd <WORKING DIRECTORY> -sd <SAVE DIRECTORY> -r 1 -nc 1
+```
+
+MetalloGen successfully generates well-formed conformers from such SDF inputs as well:
+
+<p align="center"> 
+  <img src="figures/example_sdf_output.png" alt="MetalloGen output from SDF" width="400"> 
 </p>
 
 ---

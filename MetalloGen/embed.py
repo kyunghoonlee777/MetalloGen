@@ -175,11 +175,11 @@ def get_alternative_molecule(metal_complex, option):
                     total_adj[total_wo_dummy+m][idx] = 1
                 dummy_atom_cn_list.append(len(binding_indices))
                 dummy_indices.append(total_wo_dummy+m)
-                metal_binding_infos.append([total_wo_dummy+m,binding_site,is_multidentate, is_haptic])
+                metal_binding_infos.append([total_wo_dummy+m,binding_site,is_multidentate,is_haptic])
                 m += 1
             else:
                 idx = atom_indices[binding_indices[0]]
-                metal_binding_infos.append([idx,binding_site,is_multidentate, is_haptic])
+                metal_binding_infos.append([idx,binding_site,is_multidentate,is_haptic])
 
     total_atom_list[metal_index] = get_dummy_center_for_valid(geometry_name)
     

@@ -28,6 +28,7 @@ def print_rd_geometry(rd_mol, positions):
         print_y = f"{y:12.8f}"
         print_z = f"{z:12.8f}"
         print(f"{element:<3} {print_x} {print_y} {print_z}")
+    print()
 
 
 class TMCOptimizer:
@@ -58,7 +59,6 @@ class TMCOptimizer:
 
 
     def clean_geometry(self,metal_complex,scale=1.0,always_qc = False):
-        print()
         print("Embedded geometry ...")
         metal_complex.print_coordinate_list()
         
@@ -343,13 +343,10 @@ class TMCOptimizer:
                         np.fill_diagonal(distance_matrix,1e6)
                         ratio_matrix = distance_matrix/R
                         min_ratio = np.min(ratio_matrix)
-                        #print ()
                         
                         # Check the Collapse of geometry ...
                         if min_ratio < ratio_criteria or not np.all(distance_matrix) > atom_d_criteria: 
-                            #print (ff)
                             print("[FF Scan] Atoms are too close ... Restoring to the original positions !")
-                            #print ('min ratio:',min_ratio)
                             print_rd_geometry(combined_rd_mol,tmp_positions)
                             tmp_positions = old_positions # Restore to original ...
                             continue
@@ -365,8 +362,6 @@ class TMCOptimizer:
                         if min_ratio < bond_criteria:
                             if min_ratio > total_min_ratio + 0.1 or min_distance > total_min_distance + 0.2: # May change ...
                                 print("[FF scan] Other atoms are likely to bind to the metal ... Using the previous positions !")
-                                #print(min_ratio, total_min_ratio, ligand_binding_groups, ligand_indices,current_binding_indices)
-                                #print(min_distance, total_min_distance)
                                 print_rd_geometry(combined_rd_mol,tmp_positions)
                                 tmp_positions = old_positions # Restore to original ...
                                 continue
@@ -400,16 +395,15 @@ class TMCOptimizer:
                             for bond in formed_bonds + removed_bonds:
                                 s, e = bond
                                 if s < e:
-                                    print (s,e,distance_matrix[s][e],ratio_matrix[s][e])
+                                    continue
+                                    #print (s,e,distance_matrix[s][e],ratio_matrix[s][e])
                             continue
                             
                         else:
                             ff_success = True
                             break
-
                 else:
                     ff_success = True
-
 
                 if not ff_success:
                     final_success = False
@@ -425,8 +419,6 @@ class TMCOptimizer:
         # Update ligand ...
         metal_complex.set_position(final_positions)
         return final_success
-
-
 
     def qc_clean(self,metal_complex,scale = 1.0):
         ligands = metal_complex.ligands

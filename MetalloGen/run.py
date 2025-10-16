@@ -3,22 +3,21 @@ This is the main file for the MetalloGen package
 MetalloGen is a package that generate 3D structures of organometallic complexes
 """
 
+import os, shutil
 import time
-import os
 import argparse
 import pickle
-import subprocess
-import shutil
 import glob
 from pathlib import Path
 
 import numpy as np
-from scipy.spatial.distance import cdist
 
 from MetalloGen import globalvars as gv
 from MetalloGen import om, embed, clean_geometry
 
 from MetalloGen.Calculator import orca, gaussian
+
+from MetalloGen.utils import clustering
 
 
 def clean_working_directory(working_directory):
@@ -138,7 +137,7 @@ def main():
     parser.add_argument("--working_directory", "-wd", type=str, help="Scratch directory for running quantum chemical calculation", default=None)
     parser.add_argument("--save_directory", "-sd", type=str, help="Directory to save the results", default=None)
     parser.add_argument("--final_relax", "-r", type=int, help="Whether to perform final relaxation after generation", default=1)
-    parser.add_argument("--num_conformer", "-nc", type=int, help="Number of conformers", default=1)
+    parser.add_argument("--num_conformer", "-nc", type=int, help="Number of conformers", default=10)
 
     args = parser.parse_args()
 
@@ -188,88 +187,100 @@ def main():
     initial_hessian = None
     #initial_hessian = 'calcfc'
 
+    total_ace_mols = []
     for i, scale in enumerate(scales):
         print(f"\nGenerating conformer with scale {scale} ...")
         print("======================================================")
-        success = False 
         generator = TMCGenerator(calculator,scale,True)
+        ace_mols = generator.sample_conformer(metal_complex)
+        total_ace_mols.extend(ace_mols)
+
+    print("=======================================================")
+    print(f"\nTotal {len(total_ace_mols)} conformers generated ...")
+
+    print(f"\nClustering conformers ...")
+    conformers = [ace_mol.get_coordinate_list() for ace_mol in total_ace_mols]
+    atom_symbol = [atom.get_element() for atom in metal_complex.get_atom_list()]
+    clusters, D = clustering.cluster_conformers_butina(conformers, atom_symbol, cutoff=0.5, exclude_H=True)
+
+    #print(clusters)
+    ##print(D)
+    #exit()
+
+    dif_ace_mols = [total_ace_mols[i[0]] for i in clusters]
+    print(f"{len(dif_ace_mols)} conformers after clustering ...")
+
+    if not args.final_relax:
+        exit()
+
+    print("\nPerforming final relaxation ...")
+    for i, ace_mol in enumerate(dif_ace_mols):
+        print(f"Relaxing conformer {i+1}/{len(dif_ace_mols)} ...")
+        print("======================================================")
+        success = False
         for j in range(num_trial):
-            ace_mols, gen_times, scan_times = generator.sample_conformer(metal_complex, return_time=True)
-            if not args.final_relax:
-                exit()
-                                
-            for k, ace_mol in enumerate(ace_mols):
-                relax_st = time.time()
-                original_energy = ace_mol.energy.copy()
-                if original_energy == 1e6:
-                    break
+            original_energy = ace_mol.energy.copy()
+            if original_energy == 1e6:
+                break
+            
+            print("\nGenerated geometry ...")
+            print("Energy:", original_energy)
+            ace_mol.print_coordinate_list()
+            print("\nFinal relaxation ...")
+            normal_termination = True
                 
-                print("\nGenerated geometry ...")
-                print("Energy:", original_energy)
-                ace_mol.print_coordinate_list()
-                print("\nFinal relaxation ...")
-                normal_termination = True
-                 
+            if True:
+                calculator.optimize_geometry(ace_mol, file_name=f"final_relax_{num}",initial_hessian=initial_hessian,save_directory=save_directory)
+            else:
+                normal_termination = False
+        
+            if not normal_termination:
                 if True:
                     calculator.optimize_geometry(ace_mol, file_name=f"final_relax_{num+1}",initial_hessian=initial_hessian,save_directory=save_directory)
                 else:
                     normal_termination = False
+
+            # Reset working directory                 
+            clean_working_directory(working_directory)
+            #os.system(f"/bin/rm {working_directory}/Gau-*")
+            #os.system(f"/bin/rm {working_directory}/energy")
+            #os.system(f"/bin/rm {working_directory}/gradient")
+            #os.system(f"/bin/rm {working_directory}/wbo")
+            #os.system(f"/bin/rm {working_directory}/charges")
+            #os.system(f"/bin/rm {working_directory}/xtbrestart")
+            #os.system(f"/bin/rm {working_directory}/xtbtopo.mol")
+            relaxed_energy = ace_mol.energy
+            print ("Energy:", relaxed_energy)
+            chg = ace_mol.chg
+            mult = ace_mol.multiplicity
+            content = f"{len(ace_mol.atom_list)}\n{chg}\t{mult}\t{relaxed_energy}\n"
+            for atom in ace_mol.atom_list:
+                content += atom.get_content()
+                
+            ace_mol.print_coordinate_list()
+            print()
             
-                if not normal_termination:
-                    if True:
-                        calculator.optimize_geometry(ace_mol, file_name=f"final_relax_{num+1}",initial_hessian=initial_hessian,save_directory=save_directory)
-                    else:
-                        normal_termination = False
+            if not normal_termination:
+                print("Relaxation failed ...")
+                continue
+            else:
+                # Here, we do not hessian calculation, because the geometry is simply for relaxing the structure 
+                print ("Relaxation success!")
+                num += 1
+                success = True
 
-                # Reset working directory                 
-                clean_working_directory(working_directory)
-                #os.system(f"/bin/rm {working_directory}/Gau-*")
-                #os.system(f"/bin/rm {working_directory}/energy")
-                #os.system(f"/bin/rm {working_directory}/gradient")
-                #os.system(f"/bin/rm {working_directory}/wbo")
-                #os.system(f"/bin/rm {working_directory}/charges")
-                #os.system(f"/bin/rm {working_directory}/xtbrestart")
-                #os.system(f"/bin/rm {working_directory}/xtbtopo.mol")
-                relaxed_energy = ace_mol.energy
-                print ("Energy:", relaxed_energy)
-                chg = ace_mol.chg
-                mult = ace_mol.multiplicity
-                content = f"{len(ace_mol.atom_list)}\n{chg}\t{mult}\t{relaxed_energy}\n"
-                for atom in ace_mol.atom_list:
-                    content += atom.get_content()
-                 
-                ace_mol.print_coordinate_list()
-                print()
-
-               
-                if not normal_termination:
-                    print("Relaxation failed ...")
-                    continue
-                else:
-                    # Here, we do not hessian calculation, because the geometry is simply for relaxing the structure 
-                    print ("Relaxation success!")
-                    num += 1
-                    success = True
-
-                if save_directory:
-                    conf_save_directory = os.path.join(save_directory,f"result_{num}.xyz")
-                    with open(conf_save_directory, "w") as f:
-                        f.write(content)
-
-                if num >= args.num_conformer:
-                    break
+            if save_directory:
+                conf_save_directory = os.path.join(save_directory,f"result_{num}.xyz")
+                with open(conf_save_directory, "w") as f:
+                    f.write(content)
 
             if success:
                 break
-
-        print("======================================================\n")
         if num >= args.num_conformer:
             break
 
-    if num > 0:
-        print ("Success: True")
-    else:
-        print ("Success: False")
+    print("=======================================================")
+    print(f"\nTotal {num} conformers are successfully relaxed ...")
         
     
 if __name__ == "__main__":

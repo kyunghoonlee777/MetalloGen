@@ -519,7 +519,7 @@ def get_embedding(metal_complex, scale=1.0, option=0, align=False, use_random=Tr
             candidate_list.append((positions,-diff))
             continue
 
-        print("Embedding success!")
+        print("Embedding success!\n")
         
         return positions[:metal_complex.num_atom]
     

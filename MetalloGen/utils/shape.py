@@ -60,8 +60,6 @@ def shape_measure(binding_vectors, direction_vectors, k=5):
         
     return min_rmsd, best_assigned_indices
 
-
-
 def assign_shape(ace_mol, center_index):
     adj_matrix = ace_mol.get_adj_matrix()
     coordinate_list = ace_mol.get_coordinate_list()

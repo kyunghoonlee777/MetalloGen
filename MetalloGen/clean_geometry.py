@@ -50,13 +50,9 @@ class TMCOptimizer:
         self.bond_criteria = 1.2
         self.d_converge = 0.05 # Convergence criteria for FF opt
         self.fix_value = 20.0
-        #self.fix_value = 50.0
-        #self.binding_fix_value = 200.0
         self.binding_fix_value = 2000.0
         self.chk_file = 'scan.chk'
         self.scale_factor = {1:1, 2:1.1, 3:1.1, 4:1.1, 5:1.2, 6:1.2, 7:1.2, 8:1.2, 9:1.2, 'else':1.6}
-        #self.ligand_d_criteria = 1.7
-
 
     def clean_geometry(self,metal_complex,scale=1.0,always_qc = False):
         print("Embedded geometry ...")
@@ -70,7 +66,6 @@ class TMCOptimizer:
             ff_success = False
 
         if ff_success:
-        #if True
             print("FF clean success!")
             print("FF cleaned geometry ...")
             metal_complex.print_coordinate_list()
@@ -80,13 +75,11 @@ class TMCOptimizer:
                 return qc_success
             else:
                 return True
-
         else:
             print("FF clean has failed ...")
             print("FF cleaned geometry ...")
             metal_complex.print_coordinate_list()
             print("Further cleaning with QC ...")
-            #exit()
             # Clean with QC ...
             try:
                 qc_success = self.qc_clean(metal_complex,scale)
@@ -96,17 +89,13 @@ class TMCOptimizer:
 
             return qc_success
 
-
     def ff_clean(self,metal_complex,scale = 1.0):
-        #ML_dist_dict = self.ML_dist_dict
         ligands = metal_complex.ligands
         atom_indices_for_each_ligand = metal_complex.get_atom_indices_for_each_ligand()
         center_atom = metal_complex.center_atom
         metal_r = center_atom.get_radius()
         metal_xyz = center_atom.get_coordinate()
        
-        #print ('ligand',atom_indices_for_each_ligand)
-
         # Prepare FF setting ...    
         rd_mol_list = []
         tmp_positions = [] 
@@ -149,7 +138,6 @@ class TMCOptimizer:
 
             if valid_ace_mol is None:
                 valid_ace_mol = ace_mol.get_valid_molecule(False, 'xyz2mol')
-
             if len(valid_ace_mol.atom_list) == 1:
                 valid_ace_mol.atom_list[0].set_element('Cl') # In case H- fail ...
                 valid_ace_mol.atom_feature['chg'] = np.array([-1])
@@ -305,8 +293,6 @@ class TMCOptimizer:
                     # FF opt    
                     if mmff is not None:
                         mmff.Initialize()
-                        #for atom_idx in scanning_indices:
-                            #mmff.AddFixedPoint(atom_idx) # Fix binding atoms ...
                         for atom_idx in range(len(tmp_positions)):
                             force_constant = fix_value
                             if atom_idx in scanning_indices:
@@ -315,9 +301,6 @@ class TMCOptimizer:
 
                     if uff is not None:
                         uff.Initialize()
-                        #for atom_idx in scanning_indices:
-                        #    uff.AddFixedPoint(atom_idx) # Fix binding atoms ...
-                        
                         for atom_idx in range(len(tmp_positions)):
                             force_constant = fix_value
                             if atom_idx in scanning_indices:
@@ -396,9 +379,7 @@ class TMCOptimizer:
                                 s, e = bond
                                 if s < e:
                                     continue
-                                    #print (s,e,distance_matrix[s][e],ratio_matrix[s][e])
                             continue
-                            
                         else:
                             ff_success = True
                             break
@@ -408,7 +389,6 @@ class TMCOptimizer:
                 if not ff_success:
                     final_success = False
                     break
-                
         # check move_dict to determine the success of FF clean 
         # Less than int(success_criteria/step_size)+1 should be left for successful clean ...
 

@@ -962,7 +962,6 @@ def get_adj_matrix_from_distance(molecule,coeff = 1.10,criteria=1.0):
     radius_matrix = radius_matrix_flatten.reshape((n,n))
     radius_sum_matrix = radius_matrix + radius_matrix.T
     coordinate_list = molecule.get_coordinate_list()
-    # print(coordinate_list)
     distance_matrix = spatial.distance_matrix(coordinate_list,coordinate_list)
     ratio_matrix = distance_matrix/radius_sum_matrix
     adj1 = np.where(distance_matrix<criteria,1,0)
@@ -1062,14 +1061,11 @@ def get_chg_list_and_bo_matrix_from_adj_matrix(
 def get_chg_and_bo(molecule,chg=None,method='SumofFragments'):
     atom_list = molecule.atom_list
     adj_matrix = molecule.get_adj_matrix()
-    #print (method,chg)
     if chg is None:
             chg = molecule.get_chg()
             if chg is None:
                 print ('Total charge is not specified! Provide charge information!')
                 return None,None
-#    if method == 'gurobi':
-#        chg_list, bo_matrix = compute_gurobi.get_chg_and_bo(molecule, chg)
     elif method == 'scipy':
         chg_list, bo_matrix = compute_scipy.get_chg_and_bo(molecule,chg)
     else:
@@ -1272,7 +1268,6 @@ def write_xyz_file_for_two_molecules(molecule_list,file_name,option='atomic numb
     if (option=="atomic number"):
         pass
     elif (option=="element"):
-        #print("you chose element option")
         opnum = 1
     else:
         print("Wrong writing option... Choose between 'atomic number' and 'element' ")
@@ -1291,11 +1286,9 @@ def write_xyz_file_for_two_molecules(molecule_list,file_name,option='atomic numb
         tmp = np.array(center_of_mass_list[1]) - np.array(center_of_mass_list[0])    
         if (np.linalg.norm(tmp) < 0.2): # when two C.O.Ms are too close
             tmp = np.array([1,0,0])
-        #print('tmp', tmp)
         norm = np.linalg.norm(tmp)
         scaler = sum(molecule_radius_list)*scale
         move_vector = tmp/norm*scaler 
-        #print('mo', move_vector)
         move_molecule(molecule_list[1], move_vector)
     
     if file_name[-4:] != '.xyz':
@@ -1389,7 +1382,6 @@ def is_same_connectivity(original_molecule,new_molecule,max_coeff=1.3,min_coeff=
         adj_matrix = get_adj_matrix_from_distance(new_molecule,coeff)
         new_molecule.set_adj_matrix(adj_matrix)
         is_same = new_molecule.is_same_molecule(original_molecule,False)
-        #print (adj_matrix - original_molecule.get_adj_matrix())
         if is_same:
             break
         coeff += space

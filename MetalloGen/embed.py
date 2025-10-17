@@ -263,7 +263,6 @@ def align_double_single_ligand(metal_complex, positions, d_criteria=1.7):
         binding_infos = ligand.binding_infos
         atom_list = ligand.molecule.atom_list
         
-        #print(binding_infos)
         if len(binding_infos) > 1 or len(binding_infos[0][0]) > 1:
             continue
         
@@ -320,14 +319,12 @@ def align_double_single_ligand(metal_complex, positions, d_criteria=1.7):
         for j in atom_indices:
             for k in other_indices:
                 if distance_matrix[j,k] < d_criteria:
-                    #print('Invalid alignment ... atoms are too close ...')
                     continue
        
         # Check potential
         current_potential = get_repulsive_potential(positions)
         new_potential = get_repulsive_potential(tmp_positions)
         if new_potential > 10 * current_potential:
-            #print('Invalid alignment ... potential is too high ...')
             continue
         
         positions = tmp_positions.copy()
@@ -371,9 +368,7 @@ def get_embedding(metal_complex, scale=1.0, option=0, align=False, use_random=Tr
     
     if use_random is True:
         params.randomSeed = random.randint(0,1000000)
-    
-    #print("Alternative molecules embedding ...")
-    
+        
     candidate_list = []
     scales_for_haptic = [0.4,0.5,0.6,0.7]
 

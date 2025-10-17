@@ -99,7 +99,6 @@ class MetalComplex:
                     adj_matrix[start][end] = mol_adj[j][k]
                     adj_matrix[end][start] = mol_adj[k][j]
         binding_groups = self.get_binding_groups()   
-        #print ("binding_groups:",binding_groups)
         for group in binding_groups:
             for i in group:
                 adj_matrix[metal_index][i] = 1
@@ -200,9 +199,8 @@ class MetalComplex:
         return isomers
             
     def get_embedding(self,num_conformer = 10, d_criteria = 0.5, align=True):
-        #options = [0, 1, 2]
         options = [0, 1]
-        min_d = -0.1 #0.1
+        min_d = -0.1
         max_d = 0.4
         num_conf_per_option = int((num_conformer+1)/2)
         if num_conf_per_option == 0:
@@ -221,7 +219,6 @@ class MetalComplex:
                     positions = embed.get_embedding(self,scale,option,align=align)
                     if positions is not None:
                         candidate_positions.append(positions)
-                        #break
                 else:
                     continue
 
@@ -267,7 +264,6 @@ class MetalComplex:
             atom_set = next_set
             distance += 1
         return neighbor_list
-
 
 def replace_actinide(metal_complex):
     metal_atom = metal_complex.center_atom

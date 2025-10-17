@@ -203,10 +203,6 @@ def main():
     atom_symbol = [atom.get_element() for atom in metal_complex.get_atom_list()]
     clusters, D = clustering.cluster_conformers_butina(conformers, atom_symbol, cutoff=0.5, exclude_H=True)
 
-    #print(clusters)
-    ##print(D)
-    #exit()
-
     dif_ace_mols = [total_ace_mols[i[0]] for i in clusters]
     print(f"{len(dif_ace_mols)} conformers after clustering ...")
 

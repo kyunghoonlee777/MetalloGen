@@ -241,7 +241,6 @@ class Atom:
         else: 
             return 0
        
-
     def get_mass(self):
         """
         Returns the exact value (float) of an atomic mass of a given atom.
@@ -522,7 +521,6 @@ class Molecule:
                     try:
                         content = f.readline().strip()
                         atom_line = content.split()
-                        #atomic_number = int(atom_line[0])
                         element_symbol = atom_line[0]
                         x = float(atom_line[1]) 
                         y = float(atom_line[2]) 
@@ -553,7 +551,6 @@ class Molecule:
                     try:
                         content = f.readline().strip()
                         atom_line = content.split()
-                        #atomic_number = int(atom_line[0])
                         element_symbol = atom_line[0]
                         x = float(atom_line[1]) 
                         y = float(atom_line[2]) 
@@ -637,7 +634,6 @@ class Molecule:
                 make = True
             except:
                 make = False
-                #print ('Wrong input type!!!')
             if make:
                 # Data: (z_list,adj_matrix,bo_matrix,chg_list)
                 atom_list = []
@@ -652,11 +648,7 @@ class Molecule:
                 if self.adj_matrix is None and self.bo_matrix is not None:
                     self.adj_matrix = np.where(self.bo_matrix>0,1,0)
             else:
-                #print ('Something wrong with the input data!!! Check your data again!')
-                a = 1
-             
-        #if data != None:
-        #    self.formula_id = int(np.sum(self.get_z_list()**3))
+                a = 1 
 
     def reset_molecule(self):
         self.atom_list = None
@@ -963,7 +955,6 @@ class Molecule:
             total_mass = np.sum(mass_list)
             mass_list = np.expand_dims(mass_list,-1)
             weighted_coords = coordinate_list * mass_list
-            #print (weighted_coords)
             center_of_mass = np.sum(weighted_coords,axis=0)/total_mass
             return center_of_mass
 
@@ -1087,12 +1078,10 @@ class Molecule:
         radius_matrix = radius_matrix_flatten.reshape((n,n))
         radius_sum_matrix = radius_matrix + radius_matrix.T
         coordinate_list = self.get_coordinate_list()
-        # print (coordinate_list)
         distance_matrix = spatial.distance_matrix(coordinate_list,coordinate_list)
         ratio_matrix = distance_matrix/radius_sum_matrix
         return ratio_matrix
         
-
     def __eq__(self,molecule):
         return self.is_same_molecule(molecule,True)
        
@@ -1245,7 +1234,6 @@ class Molecule:
         try:
             return atom_feature['chg']
         except:
-            #print ('charge lists are not prepared!!!')
             return None
     
     def get_valency_list(self):
@@ -1560,7 +1548,6 @@ class Molecule:
                         trunc_bond_list.append((atom1,atom2))
         return trunc_bond_list    
 
-
     def get_formula(self,return_type = 'dict'):
         """
         Returns stoichiometry (chemical formula) of a given molecule
@@ -1598,7 +1585,6 @@ class Molecule:
             formula += maximal_element_type+str(maximum)
             del(element_num[element_type])
         return formula
-
 
     def get_formula_as_list(self):
         """
@@ -1754,9 +1740,6 @@ class Molecule:
             xyz = (float(pos[i][0]), float(pos[i][1]), float(pos[i][2]))
             conformer.SetAtomPosition(i, xyz)
         return rd_mol
-
-
-
 
     def get_ob_mol(self,include_stereo=False):
         """
@@ -1942,191 +1925,6 @@ class Molecule:
         new_z_list = virtual_molecule.get_z_list()
         return virtual_molecule
 
-    '''    
-    def get_valid_molecule(self,method='SumofFragments'):
-        bo_matrix = self.get_matrix('bo')
-        chg_list = self.get_chg_list()
-        if bo_matrix is None:
-            chg = self.chg
-            if chg is None:
-                chg = 0
-            chg_list, bo_matrix = process.get_chg_and_bo(self,chg)
-            #bo_matrix = process.get_bo_matrix_from_adj_matrix(self,chg)
-            #chg_list = process.get_chg_list_from_bo_matrix(self,chg,bo_matrix)
-        period_list,group_list = self.get_period_group_list()
-        n = len(chg_list)
-        adj_matrix = np.where(bo_matrix>0,1,0)
-        total_bo_list = np.sum(bo_matrix,axis=1)
-        # Compute SN
-        lone_pair_list = (group_list - total_bo_list - chg_list)/2
-        #lone_pair_list = np.where(lone_pair_list>0,lone_pair_list,0)
-        problem_indices = np.where(lone_pair_list<0)[0].tolist()
-        lone_pair_list[problem_indices] = 0
-        sn_list = lone_pair_list + total_bo_list
-        overoctet_indices = set(np.where(sn_list > 4)[0].tolist())
-        total_indices = set(problem_indices)
-        total_indices = list(total_indices|overoctet_indices)
-        z_list = self.get_z_list()
-        new_z_list = np.copy(z_list)
-        new_chg_list = np.copy(chg_list)
-        #print ('z',z_list)
-        #print ('chg',new_chg_list)
-        #print ('sn',sn_list)
-        #print ('l',lone_pair_list)
-        for i in total_indices:
-            # First change charge
-            if period_list[i] == 1: # Case of hydrogen overvalence
-                if sn_list[i] > 1:
-                    new_z_list[i] = 8
-                    new_chg_list[i] = 0
-            else:
-                new_chg_list[i] = 0
-                new_z_list[i] = total_bo_list[i] + 10 + (total_bo_list[i] + chg_list[i] + z_list[i])%2
-        virtual_molecule = Molecule((new_z_list,None,bo_matrix,new_chg_list))
-        return virtual_molecule
-
-    def get_valid_molecule(self,method='SumofFragments'):
-        bo_matrix = self.get_matrix('bo')
-        chg_list = self.get_chg_list()
-        if bo_matrix is None:
-            chg = self.chg
-            if chg is None:
-                chg = 0
-            #bo_matrix = process.get_bo_matrix_from_adj_matrix(self,chg)
-            #chg_list = process.get_chg_list_from_bo_matrix(self,chg,bo_matrix)
-            chg_list, bo_matrix = process.get_chg_and_bo(self,chg,method)
-        period_list,group_list = self.get_period_group_list()
-        n = len(chg_list)
-        adj_matrix = np.where(bo_matrix>0,1,0)
-        # Compute SN
-        lone_pair_list = (group_list - np.sum(bo_matrix,axis=1) - chg_list)/2
-        lone_pair_list = np.where(lone_pair_list>0,lone_pair_list,0)
-        sn_list = lone_pair_list + np.sum(adj_matrix,axis=1)
-        z_list = self.get_z_list()
-        new_z_list = np.copy(z_list)
-        new_chg_list = np.copy(chg_list)
-        #print ('z',z_list)
-        #print ('chg',new_chg_list)
-        #print ('sn',sn_list)
-        #print ('l',lone_pair_list)
-        for i in range(n):
-            # First change charge
-            if lone_pair_list[i] < 0:
-                pass 
-            if period_list[i] == 1: # Case of hydrogen overvalence
-                if sn_list[i] > 1:
-                    new_z_list[i] = 8
-                    new_chg_list[i] = 0
-            elif period_list[i] == 2:
-                if sn_list[i] > 3 and sn_list[i] <= 4:
-                    new_z_list[i] = 6 # C
-                    new_chg_list[i] = 0
-                if sn_list[i] > 4 and sn_list[i] <= 5:
-                    new_z_list[i] = 15 # P
-                    new_chg_list[i] = 0
-                elif sn_list[i] >= 5:
-                    new_z_list[i] = 16 # S
-                    new_chg_list[i] = 0
-        #print (new_z_list,new_chg_list,sn_list,bo_matrix)
-        virtual_molecule = Molecule((new_z_list,None,bo_matrix,new_chg_list))
-        return virtual_molecule
-    '''
-    '''
-    def get_valid_molecule(self): # Function for generating 3D geometry of unstable molecules
-        adj_matrix = self.get_matrix('adj')
-        valency_list = np.sum(adj_matrix,axis=1)
-        group_list = self.get_group_list()
-        new_chg_list = np.copy(self.get_chg_list())
-        new_z_list = np.copy(self.get_z_list())
-        n = len(new_z_list)
-        # Replace atoms by using valency 
-        period_list,group_list = self.get_period_group_list()
-        add_z_list = [0,2,10,28,46] # 1, 2, 3, 4, 5
-        e_list = self.get_num_of_lone_pair_list()
-        if e_list is None:
-            e_list = [1] * n
-        for i in range(n):
-            if valency_list[i] == 1:
-                if period_list[i] == 1:
-                    new_z_list[i] = 1 # Use H
-                elif period_list[i] == 2:
-                    new_z_list[i] = 9 # Use F
-                elif period_list[i] == 3:
-                    new_z_list[i] = 17 # Use Cl
-                elif period_list[i] == 4:
-                    new_z_list[i] = 35 # Use Br
-                else:
-                    new_z_list[i] = 53 # Use I
-            elif valency_list[i] == 2:
-                if period_list[i] < 3:
-                    if group_list[i] > 4:
-                        new_z_list[i] = 8 # Use O
-                    else:
-                        #new_z_list[i] = 4
-                        new_z_list[i] = 8
-                elif period_list[i] > 2:
-                    if group_list[i] > 4:
-                        new_z_list[i] = 16 # Use S
-                    else:
-                        new_z_list[i] = 12
-            elif valency_list[i] == 3:
-                if period_list[i] < 3:
-                    if group_list[i] > 5:
-                        new_z_list[i] = 7 # Use N
-                    else:
-                        new_z_list[i] = 5
-                elif period_list[i] > 2:
-                    if group_list[i] > 5:
-                        new_z_list[i] = 15 # Use P
-                    else:
-                        new_z_list[i] = 13
-            elif valency_list[i] == 4:
-                if period_list[i] == 2:
-                    new_z_list[i] = 6 # Use C
-                elif period_list[i] > 2:
-                    new_z_list[i] = 14 # Use Si
-            elif valency_list[i] == 5:
-                new_z_list[i] = 15 # Just use P
-            elif valency_list[i] == 6:
-               new_z_list[i] = 16 # Just use S
-        print (new_z_list)
-        virtual_molecule = Molecule((new_z_list,None,adj_matrix,np.zeros((n))))
-        return virtual_molecule
-        # (TODO): Need to come up with better replacements
-        for i in range(n):
-            period = period_list[i]
-            group = group_list[i]
-            valency = valency_list[i] 
-            num_electron = int(e_list[i])
-            steric_number = num_electron + valency
-            if valency == 1:
-                if period == 1:
-                    new_z_list[i] = 1 # Use H
-                else: 
-                    new_z_list[i] = add_z_list[period-1] + 7 # Use halogen
-            elif valency == 2:
-                if period == 1:
-                    new_z_list[i] = 8 # Replace O for hydrogen case
-                elif num_electron < 1:
-                    new_z_list[i] = add_z_list[period-1] + 2 # Use 2th group elements
-                else:
-                    new_z_list[i] = add_z_list[period-1] + 6 # Use O, X, Se, Te
-            elif valency == 3:
-                if num_electron < 1:
-                    new_z_list[i] = add_z_list[period-1] + 3 # Use B, Al, ...
-                else:
-                    new_z_list[i] = add_z_list[period-1] + 5 # Use N, P, ...
-            elif valency == 4:
-                new_z_list[i] = add_z_list[period-1] + 4 # Use C, Si, ...
-            elif valency == 5:
-                new_z_list[i] = 15 # Just use P. Normally, it works well
-            elif valency == 6:
-               new_z_list[i] = 16 # Just use S. Normally, it works well
-        virtual_molecule = Molecule((new_z_list,None,adj_matrix,np.zeros((n))))
-        return virtual_molecule
-        '''
-    # bookmark -jw
-
     def make_3d_coordinate(self,library='rdkit'):
         return self.make_3d_coordinates(1,library)[0]
 
@@ -2184,7 +1982,6 @@ class Molecule:
             for energy in conformer_energy_list[:num_conformer]:
                 conformer_id = energy_to_id[energy]
                 conformer = conformers[conformer_id]
-                #energy = conformer_energy_list[conformer_id]
                 coordinate_list = []
                 for i in range(n): 
                     position = conformer.GetAtomPosition(i) 
@@ -2306,7 +2103,6 @@ class Molecule:
         data = self.get_minimal_data()
         with open(file_directory,'wb') as f:
             pickle.dump(data,f)
-        
 
     def write_input(self,save_directory,template_directory=None,parameters={'mult':None,'chg':None}):
         use_ase = False
@@ -2372,7 +2168,6 @@ class Molecule:
             input_file.write(atom_list[i].get_element()+' '+x+' '+y + ' '+z + '\n')
         input_file.write('\n\n')
 
-
     def is_appropriate_geometry(self,criteria = 0.5):
         """
         Returns whether the current molecule has appropriate geometry
@@ -2390,7 +2185,6 @@ class Molecule:
         atom_list = self.atom_list
         coordinate_list = self.get_coordinate_list()
         return process.check_geometry(coordinate_list,criteria)
-        
 
     def get_normal_vector(self,idx1,idx2,idx3):
         """
@@ -2620,7 +2414,6 @@ class Intermediate(Molecule):
                 if molecule_atom_feature is not None:
                     for key_feature in molecule_atom_feature:
                         if key_feature in atom_feature:
-                            #print (atom_feature[key_feature],molecule_atom_feature[key_feature])
                             atom_feature[key_feature] = np.concatenate((atom_feature[key_feature],molecule_atom_feature[key_feature]))
                         else:
                             atom_feature[key_feature] = molecule_atom_feature[key_feature]
@@ -2654,7 +2447,6 @@ class Intermediate(Molecule):
             self.atom_feature = atom_feature
             self.atom_list = atom_list
                     
-        
         # Update self.chg
         if 'chg' in self.atom_feature:
             self.chg = np.sum(self.atom_feature['chg'])
@@ -2691,7 +2483,6 @@ class Intermediate(Molecule):
         else:
             return [[0]]
 
-
     def get_molecule_list(self,update = False):
         """
         Returns the molecule_list stored in pyclass Intermediate
@@ -2713,7 +2504,6 @@ class Intermediate(Molecule):
             if update:
                 self.molecule_list = molecule_list
             return molecule_list
-
 
     def get_molecule_from_indices(self,indices):
         """
@@ -2779,10 +2569,8 @@ class Intermediate(Molecule):
         else:
             return int(self.multiplicity)
 
-
     def __eq__(self,intermediate):
         return self.is_same_intermediate(intermediate,True)
-
 
     def is_same_intermediate(self,intermediate,option = False):
         """
@@ -2859,7 +2647,6 @@ class Intermediate(Molecule):
             new_intermediate.c_eig_list = self.c_eig_list
         return new_intermediate
 
-
     def initialize(self,method='SumofFragments'): # Make new bo/chgs/atom_indices_for_each_molecule if possible ...
         atom_indices_for_each_molecule = self.get_atom_indices_for_each_molecule()
         n = len(self.atom_list)
@@ -2878,7 +2665,6 @@ class Intermediate(Molecule):
         self.atom_feature['chg'] = chg_list
         self.bo_matrix = bo_matrix
 
-
     def get_formula_id(self):
         if self.formula_id is not None:
             return self.formula_id
@@ -2888,7 +2674,6 @@ class Intermediate(Molecule):
         formula_id.sort()
         formula_id = tuple(formula_id)
         return formula_id
-
 
     def get_intermediate_id(self):
         if self.intermediate_id is not None:
@@ -2905,7 +2690,6 @@ class Intermediate(Molecule):
                 intermediate_id.append(molecule_id)
             intermediate_id.sort()
             return tuple(intermediate_id)
-
 
     def get_smiles(self,method = 'SumofFragments',find_stereocenter = 'N'):
         """ 
@@ -2936,7 +2720,6 @@ class Intermediate(Molecule):
             smiles = '.'.join(smiles_list)
         return smiles
 
-
     def get_energy(self):
         if self.energy is None:
             energy = 0
@@ -2949,7 +2732,6 @@ class Intermediate(Molecule):
             return energy
         else:
             return self.energy
-
 
     def make_3d_coordinates(self,num_conformer = 1,library = 'rdkit'):
         grid = 2.0
@@ -3014,7 +2796,6 @@ class Intermediate(Molecule):
                 index += 1
         return coordinates
         
-
     def visualize(self,method='rdkit'):
         # If it already has optimized geometry, use those geometires
         molecule_list = self.get_molecule_list()

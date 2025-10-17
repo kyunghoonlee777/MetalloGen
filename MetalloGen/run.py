@@ -215,7 +215,7 @@ def main():
 
     print("\nPerforming final relaxation ...")
     for i, ace_mol in enumerate(dif_ace_mols):
-        print(f"Relaxing conformer {i+1}/{len(dif_ace_mols)} ...")
+        print(f"\nRelaxing conformer {i+1}/{len(dif_ace_mols)} ...")
         print("======================================================")
         success = False
         for j in range(num_trial):
@@ -223,7 +223,7 @@ def main():
             if original_energy == 1e6:
                 break
             
-            print("\nGenerated geometry ...")
+            print("Generated geometry ...")
             print("Energy:", original_energy)
             ace_mol.print_coordinate_list()
             print("\nFinal relaxation ...")
@@ -265,7 +265,8 @@ def main():
                 continue
             else:
                 # Here, we do not hessian calculation, because the geometry is simply for relaxing the structure 
-                print ("Relaxation success!")
+                print ("Relaxation success!\n")
+                print ("=======================================================")
                 num += 1
                 success = True
 
@@ -276,6 +277,7 @@ def main():
 
             if success:
                 break
+
         if num >= args.num_conformer:
             break
 

@@ -138,6 +138,7 @@ def main():
     parser.add_argument("--save_directory", "-sd", type=str, help="Directory to save the results", default=None)
     parser.add_argument("--final_relax", "-r", type=int, help="Whether to perform final relaxation after generation", default=1)
     parser.add_argument("--num_conformer", "-nc", type=int, help="Number of conformers", default=10)
+    parser.add_argument("--calculator", "-c", type=str, help="Calculator to use", default="xtb_gaussian")
 
     args = parser.parse_args()
 
@@ -161,8 +162,15 @@ def main():
 
     # Set up the calculator
     #calculator = orca.Orca()
-    calculator = gaussian.Gaussian()
-    calculator.switch_to_xtb_gaussian()
+    if args.calculator == "xtb-gaussian":
+        calculator = gaussian.Gaussian()
+        calculator.switch_to_xtb_gaussian()
+    elif args.calculator == "orca":
+        calculator = orca.Orca()
+    elif args.calculator == "gaussian":
+        calculator = gaussian.Gaussian()
+    else:
+        raise Exception("Invalid calculator ...")
     calculator.change_working_directory(working_directory)
 
     if smiles:
@@ -215,7 +223,7 @@ def main():
         print("======================================================")
         success = False
         for j in range(num_trial):
-            original_energy = ace_mol.energy.copy()
+            original_energy = ace_mol.energy
             if original_energy == 1e6:
                 break
             

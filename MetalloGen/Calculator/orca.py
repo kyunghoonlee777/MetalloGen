@@ -31,14 +31,14 @@ def parse_energy(directory): # Read {file_name}.log
         return None
     if '.energy' in directory:
        energy_line = lines[1].strip().split()
-       energy = float(energy_line[-1])
+       energy = np.float64(energy_line[-1])
        return energy  
     else:
         temp = 100000
         for i, line in enumerate(lines):
             if 'FINAL SINGLE' in line:
                 energy_line = line.strip().split()
-                energy = float(energy_line[-1])
+                energy = np.float64(energy_line[-1])
                 return energy
         return None
 
@@ -51,7 +51,7 @@ def parse_force(directory): # Read {file_name}.engrad
     energy = None
     for i, line in enumerate(lines):
         if '# The current total energy' in line:
-            energy = float(lines[i+2].strip())
+            energy = np.float64(lines[i+2].strip())
         if '# The current gradient in Eh/bohr' in line:
             temp = i
         if i > temp+1:
@@ -347,7 +347,9 @@ class Orca:
 
     def move_file(self,file_name,save_directory):
         if file_name is not None and save_directory is not None:
-            os.system(f'mv {file_name}.* {save_directory}/')
+            #os.system(f'mv {file_name}.* {save_directory}/')
+            os.system(f'mv {file_name}.com {save_directory}/')
+            os.system(f'mv {file_name}.log {save_directory}/')
             
     # Running QC calculation without giving any additional params. Everything should be defined at the content
     def run(self,molecule,chg=None,multiplicity=None,file_name='test',save_directory=None,**kwargs): # Running with user defined result and return raw data
@@ -391,14 +393,10 @@ class Orca:
         os.chdir(self.working_directory)
         self.make_input([molecule],chg,multiplicity,file_name,'',params)
         os.system(f'{self.command} {file_name}.com > {file_name}.log')
-        #if 'xtb' in str.lower(self.content):
-            #energy = parse_energy(os.path.join(self.working_directory,f'{file_name}.energy'))
-        #else:
-        #    energy = parse_energy(os.path.join(self.working_directory,f'{file_name}.log'))
         try:
-            energy,force = parse_force(os.path.join(self.working_directory,f'{file_name}.{file_name}_XTB.engrad')) 
+            energy = parse_energy(os.path.join(self.working_directory,f'{file_name}.log'))
         except:
-            energy,force = parse_force(os.path.join(self.working_directory,f'{file_name}.engrad')) 
+            energy = None
         self.move_file(file_name,save_directory)
         converter = 1
         if energy is None:
@@ -413,6 +411,7 @@ class Orca:
             converter = 627.509474
         if self.energy_unit == 'eV':
             converter = 27.211386245988
+        self.move_file(file_name,save_directory)
         os.chdir(current_directory)
         return converter*energy
 
@@ -436,6 +435,7 @@ class Orca:
                     name = f'{file_name}.log'
                     f.write(f'Check {os.path.join(self.working_directory,name)} ...\n')
             return None
+        self.move_file(file_name,save_directory)
         os.chdir(current_directory)
         return force/bohr_to_angstrom
 
@@ -488,45 +488,41 @@ class Orca:
         os.chdir(self.working_directory)
        
         # kwargs: initial_hessian, chk_file ...
-        if 'initial_hessian' in kwargs:
-            # It would be either calcfc or readfc ...
-            hessian_option = kwargs['initial_hessian']
-        else:
-            hessian_option = ''
+        hessian_option = kwargs.get('initial_hessian', None)
 
 
         # Modify params ....
-        if str.lower(hessian_option) == 'calcfc': # Calculate hessian ...
-            if 'xtb' in str.lower(self.content):
-                # Calculate hessian with xtb 
-                perform_xtb(molecule, file_name)                    
-                # Make approximate hess file ... (Orca does not support its own read guess ...)
-                xtb_to_orca.convert_hessian(f'{file_name}.xyz','hessian',f'{file_name}.hess')
+        if isinstance(hessian_option, str):
+            hess = hessian_option.lower()
+            if hess == 'calcfc': # Calculate hessian ...
+                if 'xtb' in str.lower(self.content):
+                    # Calculate hessian with xtb 
+                    perform_xtb(molecule, file_name)                    
+                    # Make approximate hess file ... (Orca does not support its own read guess ...)
+                    xtb_to_orca.convert_hessian(f'{file_name}.xyz','hessian',f'{file_name}.hess')
+
+                    if 'geom' not in params:
+                        params['geom'] = {}
+                    if 'inhess' not in params['geom']:
+                        params['geom']['inhess'] = 'Read'
+                    if 'InHessName' not in params['geom']:
+                        params['geom']['InHessName'] = f'"{file_name}.hess"'
+                else:
+                    if 'geom' not in params:
+                        params['geom'] = {}
+                    if 'calc_hess' not in params['geom']:
+                        params['geom']['calc_hess'] = ' True'
+
+            elif hess == 'readfc': # Read fc
+                # Hessian name should be same with {file_name}.hess
+                hessian_name = kwargs.get('hessian_name', file_name)
+
                 if 'geom' not in params:
                     params['geom'] = dict()
                 if 'inhess' not in params['geom']:
-                    params['geom']['inhess'] = 'Read'
+                    params['geom']['inhess'] = ' Read'
                 if 'InHessName' not in params['geom']:
-                    params['geom']['InHessName'] = f'"{file_name}.hess"'
-            else:
-                if 'geom' not in params:
-                    params['geom'] = dict()
-                if 'calc_hess' not in params['geom']:
-                    params['geom']['calc_hess'] = ' True'
-
-        elif str.lower(hessian_option) == 'readfc': # Read fc
-            # Hessian name should be same with {file_name}.hess
-            if 'hessian_name' in kwargs:
-                hessian_name = kwargs['hessian_name']
-            else:
-                hessian_name = file_name
-
-            if 'geom' not in params:
-                params['geom'] = dict()
-            if 'inhess' not in params['geom']:
-                params['geom']['inhess'] = ' Read'
-            if 'InHessName' not in params['geom']:
-                params['geom']['InHessName'] = f'"{hessian_name}.hess"'
+                    params['geom']['InHessName'] = f'"{hessian_name}.hess"'
         
         # Add constraints to params ...
         if len(constraints) > 0:
@@ -553,8 +549,6 @@ class Orca:
         self.make_input([molecule],chg,multiplicity,file_name,'opt',params)
         os.system(f'{self.command} {file_name}.com > {file_name}.log')
         relaxing_path = parse_opt(os.path.join(self.working_directory,f'{file_name}_trj.xyz'))
-        #print (relaxing_path[-1].get_coordinate_list())
-
         if len(relaxing_path) < 2:
             if self.error_directory is not None:
                 file_directory = os.path.join(self.error_directory,'orca.err')
@@ -564,12 +558,10 @@ class Orca:
                     f.write(f'Check {os.path.join(self.working_directory,name)} ...\n')
             return []
         energy,force = parse_force(os.path.join(self.working_directory,f'{file_name}.engrad')) 
-        #print('energy:',energy)
-        #if 'xtb' in str.lower(self.content):
-        #    energy = parse_energy(os.path.join(self.working_directory,f'{file_name}.energy'))
-        #print('energy:',energy)
         process.locate_molecule(molecule,relaxing_path[-1].get_coordinate_list())
         molecule.energy = energy
+
+        self.move_file(file_name,save_directory)
         os.chdir(current_directory)
         return relaxing_path
 
@@ -636,6 +628,7 @@ class Orca:
             freq = round(freq,4)
             if freq < 0:
                 imaginary_vibrations[freq] = mode
+        self.move_file(file_name,save_directory)
         os.chdir(current_directory)
         
         return ts_molecule,imaginary_vibrations
@@ -647,10 +640,7 @@ class Orca:
 
 if __name__ == '__main__':
     import sys
-    #directory = sys.argv[1]
-    #data = parse_hessian(directory)
-    #print (data)
-    #print (data.shape)
+
     molecule = sys.argv[1]
     calculator = orca.Orca()
     calculator.optimize_geometry(molecule)

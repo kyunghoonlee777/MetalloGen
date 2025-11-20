@@ -152,6 +152,7 @@ The following options are available:
 | `--save_directory` | `-sd` | `str` | `None` | Directory to save the results |
 | `--final_relax` | `-r` | `int` | `1` | Whether to perform final relaxation after generation (`0` = no, `1` = yes) |
 | `--num_conformer` | `-nc` | `int` | `1` | Number of conformers to generate |
+| `--calculator` | `-c` | `str` | `xtb_gaussian` | Calculator to use |
 
 ---
 

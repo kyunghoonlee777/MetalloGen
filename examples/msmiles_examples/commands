@@ -1,2 +1,2 @@
 metallogen -s "[Zr+4]|[Cl-:2]|[Cl-:3]|[N:1]1=C(C[C-:4]2[CH:4]=[CH:4][CH:4]=[CH:4]2)C=CC=C1(C[C-:5]3[CH:5]=[CH:5][CH:5]=[CH:5]3)|5_trigonal_bipyramidal" -wd /home/rxn_grp/scratch/metallogen_test/ -sd /home/rxn_grp/MetalloGen/examples/msmiles_examples/example_1/ -r 1 -nc 1
-metallogen -s "[Rh+3]|CC[C-:1]=O|[C-:2]#[O+]|[C-:3]#[O+]|[H-:4]|[C-:5]#[O+]|[H-:6]|6_octahedral" -wd /home/rxn_grp/scratch/metallogen_test/ -sd /home/rxn_grp/MetalloGen/examples/msmiles_examples/example_2/ -r 1 -nc 1
+metallogen -s "[Rh+3]|CC[C-:1]=O|[C-:2]#[O+]|[C-:3]#[O+]|[H-:4]|[C-:5]#[O+]|[H-:6]|6_octahedral" -wd /home/rxn_grp/scratch/metallogen_test/ -sd /home/rxn_grp/MetalloGen/examples/msmiles_examples/example_2/ -r 1 -nc 1 -c orca

@@ -95,37 +95,6 @@ Example:
 
 ---
 
-# Quickstart
-
-Once your QC backends are configured:
-
-### 1. m-SMILES + default `xtb_gaussian` (Gaussian + xTB)
-
-```bash
-metallogen \
-  -s "[Zr+4]|[Cl-:2]|[Cl-:3]|[N:1]1=C(C[C-:4]2[CH:4]=[CH:4][CH:4]=[CH:4]2)C=CC=C1(C[C-:5]3[CH:5]=[CH:5][CH:5]=[CH:5]3)|5_trigonal_bipyramidal" \
-  -wd /path/to/work_dir \
-  -sd /path/to/save_dir \
-  -r 1 \
-  -nc 1
-```
-
-### 2. SDF input + ORCA
-
-```bash
-metallogen \
-  -id /path/to/sdf_files \
-  -wd /path/to/work_dir \
-  -sd /path/to/save_dir \
-  -r 1 \
-  -nc 3 \
-  -c orca
-```
-
-> Make sure `-wd` (working directory) and `-sd` (save directory) are valid paths (MetalloGen will write files there).
-
----
-
 # Executing MetalloGen
 
 MetalloGen can be executed with two types of inputs:

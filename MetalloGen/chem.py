@@ -63,11 +63,9 @@ class Atom:
             else:
                 self.atomic_number = data
 
-
     def set_atomic_number(self,atomic_number):
         self.atomic_number = atomic_number
         self.element = periodic_table[atomic_number-1]
-        
 
     def set_element(self, element):
         """ Type of an atom. e.g. 'C', 'H', 'O', and so on.""" 
@@ -107,7 +105,6 @@ class Atom:
     def set_is_divalent_hydrogen(self,divalency):
         self.is_divalent_hydrogen = divalency
 
-
     def set_atom_type(self, atom_type):
         """ An attribute for defining atom types used in molecular mechanics calculations (e.g. C-CT, H-HC, and so on.) """ 
         self.atom_type = atom_type
@@ -118,7 +115,6 @@ class Atom:
     def set_is_active(self, is_active):
         """ True or False. Whether an atom is assigned as active one or not""" 
         self.is_active = is_active
-
 
     def get_atomic_number(self):
         """
@@ -147,7 +143,6 @@ class Atom:
                 print ('element',element)
                 print ('modify periodic table!!!')
         return self.atomic_number
-
 
     def get_element(self):
         """
@@ -212,8 +207,6 @@ class Atom:
                                 Y=3,ZR=4,NB=5,MO=6,TC=7,RU=8,RH=9,PD=10,AG=11,CD=12,\
                                 LU=3,HF=4,TA=5,W=6,RE=7,OS=8,IR=9,PT=10,AU=11,HG=12)
         return num_electrons[element_type]
-       
-
 
     def get_electronegativity(self):
         """
@@ -424,8 +417,6 @@ class Atom:
         new_atom.x = self.x
         new_atom.y = self.y
         new_atom.z = self.z
-        #new_atom.molecule_index = self.molecule_index
-        #new_atom.is_divalent_hydrogen = self.is_divalent_hydrogen
         return new_atom 
 
     def is_same_atom(self,atom):
@@ -873,14 +864,12 @@ class Molecule:
         smiles_list = make_smiles.GetSMILES(atom_list,bo_matrix,bond_list,fc_list,find_stereocenter)
         return smiles_list[0]
 
-
     def get_smiles_with_rdkit(self,include_hydrogen = False):
         rd_mol = self.get_rd_mol()
         if not include_hydrogen:
             rd_mol = Chem.rdmolops.RemoveHs(rd_mol)
         return Chem.MolToSmiles(rd_mol)
-
-
+        
     def get_c_eig_list(self,c_sum = False):
         """
         Returns the eigenvalues of coulomb matrix (see the instruction 'get_matrix' within class 'Molecule'.

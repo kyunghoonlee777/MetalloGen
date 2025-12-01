@@ -30,7 +30,6 @@ def print_rd_geometry(rd_mol, positions):
         print(f"{element:<3} {print_x} {print_y} {print_z}")
     print()
 
-
 class TMCOptimizer:
     
     def __init__(self, step_size = 0.1, calculator = None):
@@ -43,10 +42,8 @@ class TMCOptimizer:
         
         self.num_relaxation = 5
         self.maximal_displacement = 0.5
-        self.adj_criteria = 0 # not used
         self.ratio_criteria = 0.6
         self.atom_d_criteria = 0.5
-        self.success_criteria = 0.2 # not used
         self.bond_criteria = 1.2
         self.d_converge = 0.05 # Convergence criteria for FF opt
         self.fix_value = 20.0

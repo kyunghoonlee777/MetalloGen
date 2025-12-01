@@ -246,6 +246,7 @@ This project is licensed under the BSD 3-Clause License.
 
 # Contact Information
 
-For questions, issues, or collaboration, please contact:  
-[kyunghoonlee@kaist.ac.kr](mailto:kyunghoonlee@kaist.ac.kr)
-[pms131131@kaist.ac.kr](mailto:pms131131@kaist.ac.kr)
+For questions, issues, or collaboration, please contact:
+
+- Kyunghoon Lee - [kyunghoonlee@kaist.ac.kr](mailto:kyunghoonlee@kaist.ac.kr)
+- Minseong Park - [pms131131@kaist.ac.kr](mailto:pms131131@kaist.ac.kr)

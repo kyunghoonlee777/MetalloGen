@@ -233,6 +233,10 @@ The following options are available:
 > To use ORCA, specify `-c orca` and ensure `orca` is available on `PATH`.
 
 ---
+# Citation
+Please cite as below Kyunghoon Lee, Shinyoung Park, Minseong Park, and Woo Youn Kim. "MetalloGen: Automated 3D Conformer Generation for Diverse Coordination Complexes" Journal of Chemical Information and Modeling 65 (2025): 11878–11891.
+
+---
 
 # License
 
@@ -244,3 +248,4 @@ This project is licensed under the BSD 3-Clause License.
 
 For questions, issues, or collaboration, please contact:  
 [kyunghoonlee@kaist.ac.kr](mailto:kyunghoonlee@kaist.ac.kr)
+[pms131131@kaist.ac.kr](mailto:pms131131@kaist.ac.kr)

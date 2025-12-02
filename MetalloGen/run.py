@@ -162,7 +162,7 @@ def main():
 
     # Set up the calculator
     #calculator = orca.Orca()
-    if args.calculator == "xtb-gaussian":
+    if args.calculator == "xtb_gaussian":
         calculator = gaussian.Gaussian()
         calculator.switch_to_xtb_gaussian()
     elif args.calculator == "orca":

@@ -1,6 +1,5 @@
 import numpy as np
-
-import globalvars as gv
+from MetalloGen import globalvars as gv
 
 def _center(X):
     """Center the points in X to their centroid."""

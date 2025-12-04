@@ -196,7 +196,7 @@ def main():
     #initial_hessian = 'calcfc'
 
     total_ace_mols = []
-    for i, scale in enumerate(scales):
+    for scale in scales:
         print(f"\nGenerating conformer with scale {scale} ...")
         print("======================================================")
         generator = TMCGenerator(calculator,scale,True)
